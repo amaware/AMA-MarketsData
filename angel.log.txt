@@ -1,0 +1,12 @@
+=>net.amaware.autil.ACommDbFile=>LOGFILE |Dir=C:\projects\amawareJavaDev\projects\AMA-Apps\AMA-MarketsData |Name=angel.log.txt
+=>net.amaware.autil.ACommDbFile=>Start @2017-12-10 10:49:58.067 |LogFileName=angel.log.txt
+    |userName=angel |userHome=C:\Users\angel
+    |userDirectoryName=C:\projects\amawareJavaDev\projects\AMA-Apps\AMA-MarketsData |environment=Windows 10
+    |user.dir=C:\projects\amawareJavaDev\projects\AMA-Apps\AMA-MarketsData |dir seperator{\}
+AComm=>Arg#0=C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Fundamentals\AMEX.txt
+AComm=>ArgFileFullName{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Fundamentals\AMEX.txt} |isPath{false} |ArgFilePath{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Fundamentals} |ArgFilePathDirName{Fundamentals} |ArgFileName{AMEX.txt}
+AComm=>OutFileDirectoryWithSep{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Fundamentals\output\}
+MainMarketDataLoads=>getArgFilePath{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Fundamentals} |ArgFilePathDirName{Fundamentals}
+MainMarketDataLoads=>Input File{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Fundamentals\AMEX.txt}
+MainMarketDataLoads==>File ColHeaderRow{2} |ColDetailRowStart{3}
+=>net.amaware.autil.ACommDbFile=>Complete TS=2017-12-10 10:49:58.073
