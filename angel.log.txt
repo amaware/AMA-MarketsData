@@ -1,12 +1,23 @@
-=>net.amaware.autil.ACommDbFile=>LOGFILE |Dir=C:\projects\amawareJavaDev\projects\AMA-Apps\AMA-MarketsData |Name=angel.log.txt
-=>net.amaware.autil.ACommDbFile=>Start @2017-12-10 10:49:58.067 |LogFileName=angel.log.txt
+=>net.amaware.autil.ACommDb=>LOGFILE |Dir=C:\projects\amawareJavaDev\projects\AMA-Apps\AMA-MarketsData |Name=angel.log.txt
+=>net.amaware.autil.ACommDb=>Start @2017-12-17 09:51:40.175 |LogFileName=angel.log.txt
     |userName=angel |userHome=C:\Users\angel
     |userDirectoryName=C:\projects\amawareJavaDev\projects\AMA-Apps\AMA-MarketsData |environment=Windows 10
     |user.dir=C:\projects\amawareJavaDev\projects\AMA-Apps\AMA-MarketsData |dir seperator{\}
-AComm=>Arg#0=C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Fundamentals\AMEX.txt
-AComm=>ArgFileFullName{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Fundamentals\AMEX.txt} |isPath{false} |ArgFilePath{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Fundamentals} |ArgFilePathDirName{Fundamentals} |ArgFileName{AMEX.txt}
-AComm=>OutFileDirectoryWithSep{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Fundamentals\output\}
-MainMarketDataLoads=>getArgFilePath{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Fundamentals} |ArgFilePathDirName{Fundamentals}
-MainMarketDataLoads=>Input File{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Fundamentals\AMEX.txt}
-MainMarketDataLoads==>File ColHeaderRow{2} |ColDetailRowStart{3}
-=>net.amaware.autil.ACommDbFile=>Complete TS=2017-12-10 10:49:58.073
+______net.amaware.autil.ACommDb_____dbConGet()________________________________________________________
+=>net.amaware.autil.ACommDb=>DB Con OPENED |propFileName{/projects/amawareJavaDev/propertiesAMAWARE\markets-amaware.properties}
+ |URL{jdbc:mysql://db154.pair.com:3306/amaware_markets}
+ |DBProduct{MySQL} |DBVersion{5.6.31-log} |User{amaware_21}
+=>net.amaware.autil.ACommDb=>Current TS=2017-12-17 09:51:40.0
+________________________________________________________________________________________________________________________________________________________
+____________net.amaware.autil.ACommDb___dbConClose()____________________
+=>net.amaware.autil.ACommDb=>DB Con *CLOSED* |propFileName{/projects/amawareJavaDev/propertiesAMAWARE\markets-amaware.properties}
+ |URL{jdbc:mysql://db154.pair.com:3306/amaware_markets}
+ |TotRowSelectCnts{0} |TotRowInsertCnts{0} |TotRowInsertDupsCnts{0} |TotRowUpdateCnts{0} |TotRowDeleteCnts{0}
+____________________________________________________d #Files Found {1}
+EodDirectoryNames=>Connection to END for{db154-amaware_markets}
+____________net.amaware.autil.ACommDbFile___dbConClose()____________________
+=>net.amaware.autil.ACommDbFile=>DB Connection does NOT Exist |propFileName{/projects/amawareJavaDev/propertiesAMAWARE\markets-amaware.properties}
+ |URL{jdbc:mysql://localhost:3306/local}
+ |TotRowSelectCnts{0} |TotRowInsertCnts{0} |TotRowInsertDupsCnts{0} |TotRowUpdateCnts{0} |TotRowDeleteCnts{0}
+____________________________________________________
+=>net.amaware.autil.ACommDbFile=>Complete TS=2017-12-17 09:51:40.769
