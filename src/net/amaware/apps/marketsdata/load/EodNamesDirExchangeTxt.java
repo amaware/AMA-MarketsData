@@ -13,10 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.amaware.markets.proc.Enums.FileProcessStatus;
-import com.amaware.markets.proc.FeedDataStoreReport;
-import com.amaware.markets.query.REF_EXCHANGE;
-
+import net.amaware.appsbase.datatrack.DataTrackAccess;
+import net.amaware.appsbase.datatrack.DataTrackStore;
 import net.amaware.autil.ACommDb;
 import net.amaware.autil.ADataColResult;
 import net.amaware.autil.AException;
@@ -31,7 +29,7 @@ import net.amaware.serv.SourceProperty;
  * 
  */
 
-public class EodNamesDirExchangeTxt extends FeedDataStoreReport {
+public class EodNamesDirExchangeTxt extends DataTrackStore {
 /**
 	 * 
 	 */
@@ -54,20 +52,26 @@ public class EodNamesDirExchangeTxt extends FeedDataStoreReport {
 	int fileRowNum = 0;
 	int dataRowNum = 0;
 	//
-	REF_EXCHANGE qREF_EXCHANGE = new REF_EXCHANGE();
+	//REF_EXCHANGE qREF_EXCHANGE = new REF_EXCHANGE();
 	//
 	/**
 	 * 
 	 */
-	public EodNamesDirExchangeTxt(ACommDb acomm, File file) {
+	public EodNamesDirExchangeTxt(ACommDb acomm, DataTrackAccess _dataTrackAccess) {
 		//                 subject, topic, item, description
-		super(acomm, file, "feed", "ref", "exchanges","markets exchange codes");
+		super(acomm, _dataTrackAccess);
 		//set file attributes
+		setDataTrackFileFieldDelimChar(acomm.getFileTextDelimTab());
+		//
 	    mainApp.setSourceHeadRowStart(0);
 	    mainApp.setSourceDataHeadRowStart(1);
 	    mainApp.setSourceDataHeadRowEnd(1);
 	    mainApp.setSourceDataRowStart(2);
-
+        //
+	    //mainApp.setupHtmlServ();
+	    //
+	    mainApp.doProcess(acomm, thisClassName);
+	    //
 	}
 
 	@Override
@@ -153,12 +157,16 @@ public class EodNamesDirExchangeTxt extends FeedDataStoreReport {
 		//
 		++fileRowNum;
 		//
+		/*
 		if (fileRowNum > 10) {
-			acomm.addPageMsgsLineOut(thisClassName+"=>InRow#{" + fileRowNum + "}"
+			getThisHtmlServ().outPageLine(acomm, acomm.addPageMsgsLineOut(thisClassName+"=>InRow#{" + fileRowNum + "}"
 					+ " Test Limit reached...end for file{"+getSourceName()+"}"
-					);	
+					)
+                    ,htmlTitleStyle);
+			
 			return false;
 		}
+		*/
 		//getSourceDataHeadList();
 		
 		try {
@@ -173,11 +181,11 @@ public class EodNamesDirExchangeTxt extends FeedDataStoreReport {
 	 		   fModTs.setColumnValue(getTransTS());
 	 		   fModUserid.setColumnValue(acomm.getDbUserID());
                //set db cols from mapped fields
-	 		   doDSRFieldsToTableREF_EXCHANGE(acomm);	 		   
+	 		   //doDSRFieldsToTableREF_EXCHANGE(acomm);	 		   
 	 		   //insert
-	    	   qREF_EXCHANGE.doProcessInsertRow(acomm);
+	    	   //qREF_EXCHANGE.doProcessInsertRow(acomm);
 	    	   //
-	    	   setRowsInsertedOkCtr(getRowsInsertedOkCtr() + 1);
+	    	   //setRowsInsertedOkCtr(getRowsInsertedOkCtr() + 1);
 	    	   //
 	       } catch (AExceptionSql e1) {
 			  if (e1.isExceptionSqlRowDuplicate(acomm)) { //
@@ -200,7 +208,7 @@ public class EodNamesDirExchangeTxt extends FeedDataStoreReport {
 				   throw e1;
 			   }
            }
-		   
+		   /*
 		   if (qREF_EXCHANGE.getPsNumRowsInserted() > 0) {
 			   
 			   //this.dataRowAppendLine("...Row Inserted for {"+qREF_EXCHANGE.getInsertStatement(acomm)+"}"
@@ -208,7 +216,7 @@ public class EodNamesDirExchangeTxt extends FeedDataStoreReport {
 			            , this.htmlColOkStyle);
 			   
 		   }
-
+          */
 		   
 		//int _currRowNum = getSourceRowNum();
 		if (fileRowNum > getSourceDataRowEndNum()) {
@@ -330,38 +338,6 @@ public class EodNamesDirExchangeTxt extends FeedDataStoreReport {
 	 } //End doDSRFieldsValidate
 	//
 	//* SqlApp DataStoreReport SET Table columns from DSR
-	 //
-	 //*SqlApp AutoGen @2016-04-20 21:46:04.0
-	  public void doDSRFieldsToTableREF_EXCHANGE(ACommDb acomm) {
-	              doDSRFieldsToTableREF_EXCHANGE(acomm,  qREF_EXCHANGE);
-	 //
-	  } //End doDSRFieldsToTableREF_EXCHANGE qREF_EXCHANGE
-	 //
-	 //
-	  public void doDSRFieldsToTableREF_EXCHANGE(ACommDb acomm, REF_EXCHANGE _qClass) {
-	    _qClass.setExchCd(fExchCd.getColumnValue());
-	    _qClass.setExchangeNme(fExchangeNme.getColumnValue());
-	    _qClass.setModTs(fModTs.getColumnValue());
-	    _qClass.setModUserid(fModUserid.getColumnValue());
-	 //
-	  } //End doDSRFieldsToTable REF_EXCHANGE _qClass
-	 //
-	 //
-	 //* SqlApp DataStoreReport SET Data Fields from Table columns
-	 //
-	 //*SqlApp AutoGen @2016-04-20 21:46:04.0
-	  public void doDSRFieldsFromTableREF_EXCHANGE(ACommDb acomm) {
-	              doDSRFieldsFromTableREF_EXCHANGE(acomm,  qREF_EXCHANGE);
-	 //
-	  } //End doDSRFieldsFromTableREF_EXCHANGE
-	 //
-	  public void doDSRFieldsFromTableREF_EXCHANGE(ACommDb acomm, REF_EXCHANGE _qClass) {
-	     fExchCd.setColumnValue(_qClass.getExchCd());
-	     fExchangeNme.setColumnValue(_qClass.getExchangeNme());
-	     fModTs.setColumnValue(_qClass.getModTs());
-	     fModUserid.setColumnValue(_qClass.getModUserid());
-	 //
-	  } //End doDSRFieldsFromTable qREF_EXCHANGE
 	 //
 	
 	

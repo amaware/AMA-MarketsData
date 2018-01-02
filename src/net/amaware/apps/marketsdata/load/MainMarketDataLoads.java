@@ -50,12 +50,12 @@ public class MainMarketDataLoads {
 	//static SqlResultServ _sqlResultServ;
 
     //Target Services
-	static HtmlTargetServ aHtmlServReport;
-    static AFileExcelPOI aFileExcelPOI = new AFileExcelPOI(); 
-	Sheet aSheetDetail;
-	Sheet aSheetResult;
-	Sheet aSheetMetaData;
-	Sheet aSheetLog;
+	//static HtmlTargetServ aHtmlServReport;
+    //static AFileExcelPOI aFileExcelPOI = new AFileExcelPOI(); 
+	//Sheet aSheetDetail;
+	//Sheet aSheetResult;
+	//Sheet aSheetMetaData;
+	//Sheet aSheetLog;
     //    	
 	
 	//Architecture Class
@@ -110,9 +110,15 @@ public class MainMarketDataLoads {
 	    	acomm.dbConClose();
 	    	acomm.end();
 			//
+		} catch (AExceptionSql e1) {
+			acomm.addPageMsgsLineOut("MainExcelDbLoad AExceptionSql msg{"+e1.getMessage()+e1.getExceptionMsg()+"}");
+			throw e1;
+
 		} catch (AException e1) {
 			acomm.addPageMsgsLineOut("MainExcelDbLoad AException msg{"+e1.getMessage()+"}");
 			throw e1;
+		
+			
 		}
 
 	}	

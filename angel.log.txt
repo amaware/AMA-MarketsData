@@ -1,5 +1,5 @@
 =>net.amaware.autil.ACommDb=>LOGFILE |Dir=C:\projects\amawareJavaDev\projects\AMA-Apps\AMA-MarketsData |Name=angel.log.txt
-=>net.amaware.autil.ACommDb=>Start @2017-12-17 09:51:40.175 |LogFileName=angel.log.txt
+=>net.amaware.autil.ACommDb=>Start @2018-01-02 14:41:29.274 |LogFileName=angel.log.txt
     |userName=angel |userHome=C:\Users\angel
     |userDirectoryName=C:\projects\amawareJavaDev\projects\AMA-Apps\AMA-MarketsData |environment=Windows 10
     |user.dir=C:\projects\amawareJavaDev\projects\AMA-Apps\AMA-MarketsData |dir seperator{\}
@@ -7,17 +7,125 @@ ______net.amaware.autil.ACommDb_____dbConGet()__________________________________
 =>net.amaware.autil.ACommDb=>DB Con OPENED |propFileName{/projects/amawareJavaDev/propertiesAMAWARE\markets-amaware.properties}
  |URL{jdbc:mysql://db154.pair.com:3306/amaware_markets}
  |DBProduct{MySQL} |DBVersion{5.6.31-log} |User{amaware_21}
-=>net.amaware.autil.ACommDb=>Current TS=2017-12-17 09:51:40.0
+=>net.amaware.autil.ACommDb=>Current TS=2018-01-02 14:41:28.0
 ________________________________________________________________________________________________________________________________________________________
+net.amaware.aproc.SqlMetaData=>getSqlColMetaVector |tabName=data_track |schema=amaware_21@73.194.8.175
 ____________net.amaware.autil.ACommDb___dbConClose()____________________
 =>net.amaware.autil.ACommDb=>DB Con *CLOSED* |propFileName{/projects/amawareJavaDev/propertiesAMAWARE\markets-amaware.properties}
  |URL{jdbc:mysql://db154.pair.com:3306/amaware_markets}
+ |TotRowSelectCnts{1} |TotRowInsertCnts{0} |TotRowInsertDupsCnts{1} |TotRowUpdateCnts{0} |TotRowDeleteCnts{0}
+____________________________________________________atype{CHAR(12)} isDataTypeQuoted{true}
+doDbMetadata=>MetaData Col#=3 name{item} isAutoIncrement{false} sqlDatatype{1} sqlDatatype{CHAR(12)} isDataTypeQuoted{true}
+doDbMetadata=>MetaData Col#=4 name{id} isAutoIncrement{false} sqlDatatype{5} sqlDatatype{SMALLINT} isDataTypeQuoted{false}
+doDbMetadata=>MetaData Col#=5 name{description} isAutoIncrement{false} sqlDatatype{12} sqlDatatype{VARCHAR(120)} isDataTypeQuoted{true}
+doDbMetadata=>MetaData Col#=6 name{mod_userid} isAutoIncrement{false} sqlDatatype{12} sqlDatatype{VARCHAR(120)} isDataTypeQuoted{true}
+doDbMetadata=>MetaData Col#=7 name{mod_ts} isAutoIncrement{false} sqlDatatype{93} sqlDatatype{DATETIME} isDataTypeQuoted{true}
+doDbMetadata=>MetaData Col#=8 name{active_ts} isAutoIncrement{false} sqlDatatype{93} sqlDatatype{DATETIME} isDataTypeQuoted{true}
+EodDirectoryNames:doProcessInsertRow=>SqlStatement{INSERT INTO data_track (subject,topic,item,description,mod_userid ) VALUES ('eodfeed','ref','exchanges','Markets Exchange Codes','amaware')}
+EodDirectoryNames=>DataTrack row Existed |Subject{eodfeed} |Topic{ref} |Item{exchanges} |Description{Markets Exchange Codes}
+EodDirectoryNames=>DataTrack row Selected from data_track  subject{eodfeed} topic{ref} item{exchanges} id{17} description{Markets Exchange Codes} mod_userid{amaware} mod_ts{2018-01-02 13:23:28.0} active_ts{2018-01-02 13:23:28.0}
+--------------------------------------------------------------
+ 
+!!!MainApp!!! delim{	} AppClass{net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt}
+_______________Input Args_________________
+Arg#0=C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt
+argSqlFileDir=C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names
+argSqlFileFullName=C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt
+argSqlFileExt=TXT
+argSqlFileNameSansExt=Exchanges
+------------------------------
+------------------------------
+isFromfile=true
+------------------------------
+_____________________end___________________
+__________PROCESSING DATA FILE________________
+____________________Report______________________
+ |reportDirName= |reportDirNameFull= |propName=MainSqlReportDir |propVal=
+=>net.amaware.serv.SourceProperty=>PropName{dbUserPassword}...value{password being HIDDEN}
+=>net.amaware.serv.SourceProperty=>PropName{FileOutputDir}...value{output}...valget{output}
+=>net.amaware.serv.SourceProperty=>PropName{sourceHeadRowStart}...value{0}...valget{0}
+=>net.amaware.serv.SourceProperty=>PropName{sourceName}...value{}...valget{}
+=>net.amaware.serv.SourceProperty=>PropName{sourceDir}...value{}...valget{}
+=>net.amaware.serv.SourceProperty=>PropName{sourceHeadRowEnd}...value{0}...valget{0}
+=>net.amaware.serv.SourceProperty=>PropName{[ACOM-DB]}...value{}...valget{}
+=>net.amaware.serv.SourceProperty=>PropName{[ACOM-USER-FILES]}...value{}...valget{}
+=>net.amaware.serv.SourceProperty=>PropName{propBasePropFile}...value{localhost.properties}...valget{localhost.properties}
+=>net.amaware.serv.SourceProperty=>PropName{dbDriverClass}...value{com.mysql.jdbc.Driver}...valget{com.mysql.jdbc.Driver}
+=>net.amaware.serv.SourceProperty=>PropName{sourceDataHeadRowStart}...value{0}...valget{0}
+=>net.amaware.serv.SourceProperty=>PropName{sourceDataRowStart}...value{1}...valget{1}
+=>net.amaware.serv.SourceProperty=>PropName{propBasePropDir}...value{/projects/amawareJavaDev/propertiesAMAWARE}...valget{/projects/amawareJavaDev/propertiesAMAWARE}
+=>net.amaware.serv.SourceProperty=>PropName{dbURL}...value{jdbc:mysql://localhost:3306/local}...valget{jdbc:mysql://localhost:3306/local}
+=>net.amaware.serv.SourceProperty=>PropName{reportFontSize}...value{1.2em}...valget{1.2em}
+=>net.amaware.serv.SourceProperty=>PropName{sourceNameFull}...value{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt}...valget{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt}
+=>net.amaware.serv.SourceProperty=>PropName{sourceDataHeadRowEnd}...value{0}...valget{0}
+=>net.amaware.serv.SourceProperty=>PropName{dbUserID}...value{amaware}...valget{amaware}
+=>net.amaware.serv.SourceProperty=>PropName{sourceDataRowEnd}...value{999999999}...valget{999999999}
+=>net.amaware.serv.SourceProperty=>PropName{dbMaxRowsReturn}...value{2000}...valget{2000}
+=>net.amaware.serv.SourceProperty=>PropName{[ACOM-BASE-PROPERTIES]}...value{}...valget{}
+____________________Report______________________
+ |reportDirName= |reportDirNameFull=C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt |propName=MainSqlReportDir |propVal=
+!!!MainApp!!! sourceFileProc delim{	}
+net.amaware.serv.HtmlTargetServ=>HTML Report File Opened |fileInName=C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt.html |fileInNameUse=C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt.html |Dir=C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\output |Name=EodNamesDirExchangeTxt~Exchanges.txt.html
+net.amaware.app.MainAppDataStore=>Processing  filename{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt}
+______net.amaware.autil.ACommDbFile_____dbConGet()________________________________________________________
+=>net.amaware.autil.ACommDbFile=>DB Con OPENED |propFileName{/projects/amawareJavaDev/propertiesAMAWARE\markets-amaware.properties}
+ |URL{jdbc:mysql://localhost:3306/local}
+ |DBProduct{MySQL} |DBVersion{5.7.17-log} |User{amaware}
+=>net.amaware.autil.ACommDbFile=>Current TS=2018-01-02 14:41:30.0
+________________________________________________________________________________________________________________________________________________________
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt:processThis=>mapColsNum=5 titles{Code|Name|mod_ts|mod_userid|Message|}
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt:processThis StatementId=0 |SourcePropertyFileName=C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt
+         |dbMaxRowsToReturn=2000 |PropertyNumberOfMaxDataRows=999999999
+ 
+net.amaware.serv.SourceServ:process=>Exchanges.txt |Source=C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt
+           |#DataStoreRowEndNum=999999999 |#SourceProcessRowMax=999999999 |#AcommDbPrepSmtMaxRows=2000
+=>mapColsNum=5
+=>net.amaware.aproc.SourceFileProc:SourceOpen=>FileName=C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt |FieldDelimiter{TAB} |DataRowStart=2 |DataRowStart=2 |DataRowEnd=999999999
+
+net.amaware.serv.SourceServ:sourceStarted=>C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt |FileHeadRow#0 |DataHeadRow#1 |DataStart#2 |DataEnd#999999999
+ 
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt |inputFileName=Exchanges______________________
+ 
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt |extractFileName=______________________
+ 
+net.amaware.serv.SourceServ:process=>AboutTo sourceStart |ProcessMode=P
+ 
+net.amaware.aproc.SourceFileProc:sourceStart=> |ProcessMode=S |sourceDataRowEnd=999999999
+net.amaware.serv.SourceServ:process=>sourceStarted |ProcessMode=S
+net.amaware.serv.SourceServ:doSourceDataHeader=> |#DataColumns=5
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt=>DataColNames=|Code|Name|mod_ts|mod_userid|Message|
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt=>DataColTitles=Code|Name|mod_ts|mod_userid|Message|
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt=>SourceDataHeadTitles=Code|Name|
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt=>DataColNames=|Code|Name|mod_ts|mod_userid|Message|
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt=>DataColTitles=|Code|Name|mod_ts|mod_userid|Message|
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt=>doDataHead Name{Code} Title{Code} Val{}
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt=>doDataHead Name{Name} Title{Name} Val{}
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt=>doDataHead Name{mod_ts} Title{mod_ts} Val{}
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt=>doDataHead Name{mod_userid} Title{mod_userid} Val{}
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt=>doDataHead Name{Message} Title{Message} Val{}
+net.amaware.serv.HtmlTargetServ=>outPageHeading=> |#Cols=5 |#Cloned=5 |DataHeadRow#1 |DataRow#0 |SourceRow#1
+net.amaware.serv.SourceServ:rowNext=>FirstDataRow@ 2 |ToEnd@ 999999999
+net.amaware.aproc.SourceFileProc |At END row#=35
+net.amaware.apps.marketsdata.load.EodNamesDirExchangeTxt:doDataRowsEnded=>StatementId=1 @SourceRows#35 @DataRow#34 |#MaxRows=999999999
+net.amaware.serv.SourceServ:sourceEnded=>C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt |#FileRows=35 |#DataRows=34
+doSourceEnded____
+net.amaware.aproc.SourceFileProc:sourceEnded=> 
+____________net.amaware.autil.ACommDbFile_____dbConCommit()____________________
+=>net.amaware.autil.ACommDbFile=>DB Con *COMMIT* |propFileName{/projects/amawareJavaDev/propertiesAMAWARE\markets-amaware.properties}
+ |URL{jdbc:mysql://localhost:3306/local}
  |TotRowSelectCnts{0} |TotRowInsertCnts{0} |TotRowInsertDupsCnts{0} |TotRowUpdateCnts{0} |TotRowDeleteCnts{0}
-____________________________________________________d #Files Found {1}
+____________________________________________________
+____________net.amaware.autil.ACommDbFile___dbConClose()____________________
+=>net.amaware.autil.ACommDbFile=>DB Con *CLOSED* |propFileName{/projects/amawareJavaDev/propertiesAMAWARE\markets-amaware.properties}
+ |URL{jdbc:mysql://localhost:3306/local}
+ |TotRowSelectCnts{0} |TotRowInsertCnts{0} |TotRowInsertDupsCnts{0} |TotRowUpdateCnts{0} |TotRowDeleteCnts{0}
+____________________________________________________
+EodDirectoryNames=>File was Processed{C:\projects\amawareData\AMA-Markets\data\MarketData\EODData\DataClient\Names\Exchanges.txt}
+EodDirectoryNames:doDirectoryFileProcess Ended #Files Found {1}
 EodDirectoryNames=>Connection to END for{db154-amaware_markets}
 ____________net.amaware.autil.ACommDbFile___dbConClose()____________________
 =>net.amaware.autil.ACommDbFile=>DB Connection does NOT Exist |propFileName{/projects/amawareJavaDev/propertiesAMAWARE\markets-amaware.properties}
  |URL{jdbc:mysql://localhost:3306/local}
  |TotRowSelectCnts{0} |TotRowInsertCnts{0} |TotRowInsertDupsCnts{0} |TotRowUpdateCnts{0} |TotRowDeleteCnts{0}
 ____________________________________________________
-=>net.amaware.autil.ACommDbFile=>Complete TS=2017-12-17 09:51:40.769
+=>net.amaware.autil.ACommDbFile=>Complete TS=2018-01-02 14:41:30.655

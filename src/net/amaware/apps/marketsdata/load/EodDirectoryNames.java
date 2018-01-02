@@ -61,26 +61,39 @@ public class EodDirectoryNames extends DataTrackAccess  {
 		
 		acomm.addPageMsgsLineOut(" ");
 		String filenamename=acomm.getFileNameName(_fileFullName);
-    	switch (filenamename.toLowerCase()) {
-          case "amex.txt": 
-			   acomm.addPageMsgsLineOut(thisClassName+" NO Processing for{"+filenamename+"}");
-   	       
-               break;
+		
+	    try {		
+	    	switch (filenamename.toLowerCase()) {
+	          case "amex.txt": 
+				   acomm.addPageMsgsLineOut(thisClassName+" NO Processing for{"+filenamename+"}");
+	   	       
+	               break;
 
-          case "exchanges.txt": 
-        	   acomm.addPageMsgsLineOut(thisClassName+" Processing for{"+filenamename+"}");
-        	   
-        	   doFileProcessed(acomm,_fileFullName);
-        	  
-   	           //
-               break;
-           
-        default: 
-	    	  //processFile(acomm, inFile);
-	    	   String outmsg=thisClassName+"===UNKNOWN Process for File  Name{"+filenamename+"}";
-			   acomm.addPageMsgsLineOut(outmsg);
-	    	  //throw new AException(acomm, outmsg);	    	
-  	    }
+	          case "exchanges.txt": 
+	        	   acomm.addPageMsgsLineOut(thisClassName+" Processing for{"+filenamename+"}");
+	        	   doFileTracking(acomm, _fileFullName
+	        				     , "eodfeed", "ref", "exchanges", "Markets Exchange Codes"
+	        				     );        	   
+	        	   
+	        	   EodNamesDirExchangeTxt aEodNamesDirExchangeTxt = new EodNamesDirExchangeTxt(acomm, this);
+	        	   
+	        	   //aEodNamesDirExchangeTxt.doProcess(acomm, thisClassName);
+	        	   
+	        	   doFileProcessed(acomm,_fileFullName);
+	        	  
+	   	           //
+	               break;
+	           
+	        default: 
+		    	  //processFile(acomm, inFile);
+		    	   String outmsg=thisClassName+"===UNKNOWN Process for File  Name{"+filenamename+"}";
+				   acomm.addPageMsgsLineOut(outmsg);
+		    	  //throw new AException(acomm, outmsg);	    	
+	  	    }
+    	
+        } catch (AExceptionSql e1) {
+            throw e1;
+        }		    	
 		
 	}
 	
