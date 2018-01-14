@@ -7,18 +7,24 @@ import java.io.File;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.apache.poi.ss.usermodel.Sheet;
+
 import net.amaware.appsbase.datatrack.DataTrackAccess;
 import net.amaware.appsbase.datatrack.DataTrackStore;
+import net.amaware.autil.AComm;
 import net.amaware.autil.ACommDb;
 import net.amaware.autil.ADataColResult;
+import net.amaware.autil.ADatabaseAccess;
 import net.amaware.autil.AException;
 import net.amaware.autil.AExceptionSql;
+import net.amaware.autil.AFileExcelPOI;
 import net.amaware.autil.AFileO;
 import net.amaware.serv.HtmlTargetServ;
 import net.amaware.serv.SourceProperty;
@@ -29,37 +35,45 @@ import net.amaware.serv.SourceProperty;
  * 
  */
 
-public class EodNamesDirExchangeTxt extends DataTrackStore {
+public class EodNamesDirExchangesTxt extends DataTrackStore {
 /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final String thisClassName = this.getClass().getName();	
+	final String thisClassName = this.getClass().getSimpleName();	
 	//
 	//*SqlApp AutoGen @2016-04-20 21:46:04.0
     protected ADataColResult fExchCd = mapDataCol("Code");
     protected ADataColResult fExchangeNme = mapDataCol("Name");
-    protected ADataColResult fModTs = mapDataCol("mod_ts");
-    protected ADataColResult fModUserid = mapDataCol("mod_userid");
+    //
+    protected ADataColResult fModTs = new  ADataColResult("mod_ts");
+    protected ADataColResult fModUserid = new  ADataColResult("mod_userid");
     //add col for msg
-    protected ADataColResult fMsg = mapDataCol("Message");
+    protected ADataColResult fMsg = new  ADataColResult("Message");
 	// 
 	AFileO outFile = new AFileO();
 	//
 	String extractFileNameProperty = "extractNameFull";
 	String extractFileName    = "";
 	//
+	static AFileExcelPOI aFileExcelPOI = new AFileExcelPOI(); 
+	Sheet aSheetDetail;	 
+	Sheet aSheetMetaData;
+	//
+	//
 	int fileRowNum = 0;
 	int dataRowNum = 0;
 	//
 	//REF_EXCHANGE qREF_EXCHANGE = new REF_EXCHANGE();
+	
 	//
 	/**
 	 * 
 	 */
-	public EodNamesDirExchangeTxt(ACommDb acomm, DataTrackAccess _dataTrackAccess) {
+	public EodNamesDirExchangesTxt(ACommDb acomm, DataTrackAccess _dataTrackAccess) {
 		//                 subject, topic, item, description
 		super(acomm, _dataTrackAccess);
+		//
 		//set file attributes
 		setDataTrackFileFieldDelimChar(acomm.getFileTextDelimTab());
 		//
@@ -95,6 +109,20 @@ public class EodNamesDirExchangeTxt extends DataTrackStore {
 			throw new AException(acomm, e1, "extractFile Open=>");
 		}
 		
+	    String outExcelFileName=AComm.getOutFileDirectory()+AComm.getFileDirSeperator()+thisClassName+".report.xls";
+	    
+	    acomm.addPageMsgsLineOut(thisClassName+ "=>Output Excel File Name{" +outExcelFileName +"}");
+		//
+		aFileExcelPOI = new AFileExcelPOI(acomm, outExcelFileName);
+		//
+		aSheetDetail=aFileExcelPOI.doCreateNewSheet(thisClassName, 2
+				    , Arrays.asList(".",".", acomm.getCurrTimestampAny(),thisDataTrackAccess.getTrackFileNameFull() )
+				  , Arrays.asList(fExchCd.getColumnName()
+				  	        , fExchangeNme.getColumnName()
+				  	        , fMsg.getColumnName()
+				            )
+             );   		
+		//
 	   acomm.addPageMsgsLineOut(thisClassName
              +" |extractFileName=" + extractFileName			    
 		     +"______________________"
@@ -186,6 +214,13 @@ public class EodNamesDirExchangeTxt extends DataTrackStore {
 	    	   //qREF_EXCHANGE.doProcessInsertRow(acomm);
 	    	   //
 	    	   //setRowsInsertedOkCtr(getRowsInsertedOkCtr() + 1);
+	 		   
+				aFileExcelPOI.doOutputRowNext(acomm, aSheetDetail
+	    			         , Arrays.asList(fExchCd.getColumnValue()
+	  				  	        , fExchangeNme.getColumnValue()
+					  	        , fMsg.getColumnValue()
+					            )
+	    				   );	 		   
 	    	   //
 	       } catch (AExceptionSql e1) {
 			  if (e1.isExceptionSqlRowDuplicate(acomm)) { //
@@ -316,7 +351,40 @@ public class EodNamesDirExchangeTxt extends DataTrackStore {
     				+" |#MaxRows=" + getSourceDataRowEndNum()
  	    					);
          }
-		
+		//
+		thisDataTrackAccess.doQueryRsExcel(aFileExcelPOI
+                , "doQueryRsExcel data_track"
+                , "Select *"
+                  +" from data_track " 
+                 //+ " Where field_nme  = '" + ufieldname +"'" 
+                 //+ " order by tab_name"
+                 + " order by subject, topic, item"
+                 );
+        //
+		thisDataTrackAccess.doDbMetadataExcelSheet(aFileExcelPOI,"DataTrack MetaData");
+		//
+		thisDataTrackAccess.childDataTrackStoreAccess.doQueryRsExcel(aFileExcelPOI
+                , "doQueryRsExcel data_track_store"
+                , "Select *"
+                  +" from data_track_store " 
+                 //+ " Where field_nme  = '" + ufieldname +"'" 
+                 //+ " order by tab_name"
+                 + " order by data_track_id, source_nme, source_create_ts"
+                 );
+        //
+		thisDataTrackAccess.childDataTrackStoreAccess.doDbMetadataExcelSheet(aFileExcelPOI,"DataTrackStore MetaData");
+    	//
+   		try {
+			aFileExcelPOI.doOutputEnd(acomm);
+		} catch (IOException e) {
+			throw new AException(acomm, e, " Close of outFileExcel");
+		}
+   		//
+  		//
+   		thisDataTrackAccess.connectionCommit();
+   		thisDataTrackAccess.connectionEnd();
+	    //	   		        
+
         
 		//return super.doDataRowsEnded(acomm);
         return true;

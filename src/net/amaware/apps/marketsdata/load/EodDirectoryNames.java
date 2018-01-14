@@ -14,13 +14,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.apache.poi.ss.usermodel.Sheet;
+
 import net.amaware.apps.marketsdata.load.MainMarketDataLoads.DirectoryName;
 import net.amaware.appsbase.datatrack.DataTrackAccess;
+import net.amaware.autil.AComm;
 import net.amaware.autil.ACommDb;
 import net.amaware.autil.ACommDbFile;
 import net.amaware.autil.ADataColResult;
+import net.amaware.autil.ADatabaseAccess;
 import net.amaware.autil.AException;
 import net.amaware.autil.AExceptionSql;
+import net.amaware.autil.AFileExcelPOI;
 import net.amaware.autil.AFileO;
 import net.amaware.serv.HtmlTargetServ;
 import net.amaware.serv.SourceProperty;
@@ -36,9 +41,10 @@ public class EodDirectoryNames extends DataTrackAccess  {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final String thisClassName = this.getClass().getName();	
+	final String thisClassName = this.getClass().getSimpleName();	
 	//
-
+//	AFileExcelPOI aFileExcelPOI = new AFileExcelPOI(); 
+//	Sheet aSheetDetail;
 	/**
 	 * 
 	 */
@@ -46,7 +52,7 @@ public class EodDirectoryNames extends DataTrackAccess  {
 		//                 subject, topic, item, description
 		super(acomm, ipropFileName);
 		//set file attributes
-
+		//
 	}
 
 	public boolean doProcess(ACommDbFile acomm) {
@@ -75,7 +81,7 @@ public class EodDirectoryNames extends DataTrackAccess  {
 	        				     , "eodfeed", "ref", "exchanges", "Markets Exchange Codes"
 	        				     );        	   
 	        	   
-	        	   EodNamesDirExchangeTxt aEodNamesDirExchangeTxt = new EodNamesDirExchangeTxt(acomm, this);
+	        	   EodNamesDirExchangesTxt aEodNamesDirExchangeTxt = new EodNamesDirExchangesTxt(acomm, this);
 	        	   
 	        	   //aEodNamesDirExchangeTxt.doProcess(acomm, thisClassName);
 	        	   
@@ -91,6 +97,8 @@ public class EodDirectoryNames extends DataTrackAccess  {
 		    	  //throw new AException(acomm, outmsg);	    	
 	  	    }
     	
+  	
+	    	
         } catch (AExceptionSql e1) {
             throw e1;
         }		    	

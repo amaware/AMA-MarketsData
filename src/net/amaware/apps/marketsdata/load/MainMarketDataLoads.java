@@ -51,13 +51,9 @@ public class MainMarketDataLoads {
 
     //Target Services
 	//static HtmlTargetServ aHtmlServReport;
-    //static AFileExcelPOI aFileExcelPOI = new AFileExcelPOI(); 
-	//Sheet aSheetDetail;
-	//Sheet aSheetResult;
-	//Sheet aSheetMetaData;
-	//Sheet aSheetLog;
-    //    	
-	
+//	static AFileExcelPOI aFileExcelPOI = new AFileExcelPOI(); 
+//	Sheet aSheetDetail;	    
+	//    	
 	//Architecture Class
 	static MainAppDataStore mainApp;
 	//Application Classes
@@ -70,14 +66,15 @@ public class MainMarketDataLoads {
     //
 	static String fileNameToProcess="";
 	//
+	
     //
 	public static void main(String[] args) {
 		//final String thisClassName = "MainExcelDbTable";
 		//
-		
+
+		// 
 		try { //setup the com class with properties file and log file prop key
 			acomm = new ACommDbFile(thisPropFileName, args);
-			
 		
 			acomm.addPageMsgsLineOut(thisClassName+"=>getArgFilePath{" + ACommDbFile.getArgFilePath() +"}"
 					                              +" |ArgFilePathDirName{" + ACommDbFile.getArgFilePathDirName() +"}"
@@ -107,6 +104,7 @@ public class MainMarketDataLoads {
 		    	  throw new AException(acomm, outmsg);	    	
 	    	}
 	    	//
+
 	    	acomm.dbConClose();
 	    	acomm.end();
 			//
