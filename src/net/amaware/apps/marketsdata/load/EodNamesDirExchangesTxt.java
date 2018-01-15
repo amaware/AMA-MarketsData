@@ -185,17 +185,11 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 		//
 		++fileRowNum;
 		//
-		/*
-		if (fileRowNum > 10) {
-			getThisHtmlServ().outPageLine(acomm, acomm.addPageMsgsLineOut(thisClassName+"=>InRow#{" + fileRowNum + "}"
-					+ " Test Limit reached...end for file{"+getSourceName()+"}"
-					)
-                    ,htmlTitleStyle);
-			
-			return false;
-		}
-		*/
-		//getSourceDataHeadList();
+		
+		
+		getDataColResultListAsString();
+		
+		acomm.addPageMsgsLineOut(thisClassName+"=>Mapped Cols=>" + getDataColResultListAsString());
 		
 		try {
 			   this.doDSRFieldsValidate(acomm);
@@ -204,7 +198,7 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 			e.printStackTrace();
 		   }
 		
-	       try { 
+	   try { 
 	 		   //setup defaults
 	 		   fModTs.setColumnValue(getTransTS());
 	 		   fModUserid.setColumnValue(acomm.getDbUserID());
@@ -215,6 +209,9 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 	    	   //
 	    	   //setRowsInsertedOkCtr(getRowsInsertedOkCtr() + 1);
 	 		   
+	 		    thisDataTrackStoreAccess.doProcessInsertRowForColsNotDefaulted();
+	 		    thisDataTrackStoreAccess.connectionCommit();
+	 		    
 				aFileExcelPOI.doOutputRowNext(acomm, aSheetDetail
 	    			         , Arrays.asList(fExchCd.getColumnValue()
 	  				  	        , fExchangeNme.getColumnValue()
