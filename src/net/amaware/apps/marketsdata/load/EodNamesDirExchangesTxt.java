@@ -43,22 +43,24 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 	final String thisClassName = this.getClass().getSimpleName();	
 	//
 	//*SqlApp AutoGen @2016-04-20 21:46:04.0
-    protected ADataColResult fExchCd = mapDataCol("Code");
-    protected ADataColResult fExchangeNme = mapDataCol("Name");
+    protected ADataColResult fExchCd = mapDataCol("exch_cd");
+    protected ADataColResult fExchangeNme = mapDataCol("exchange_nme");
     //
     protected ADataColResult fModTs = new  ADataColResult("mod_ts");
     protected ADataColResult fModUserid = new  ADataColResult("mod_userid");
     //add col for msg
     protected ADataColResult fMsg = new  ADataColResult("Message");
-	// 
+	//
+    //ADatabaseAccess thisADatabaseAccess; // in super
+	static AFileExcelPOI aFileExcelPOI = new AFileExcelPOI(); 
+	Sheet aSheetRequest;	 
+	Sheet aSheetResult;
+	//
+    //
 	AFileO outFile = new AFileO();
 	//
 	String extractFileNameProperty = "extractNameFull";
 	String extractFileName    = "";
-	//
-	static AFileExcelPOI aFileExcelPOI = new AFileExcelPOI(); 
-	Sheet aSheetDetail;	 
-	Sheet aSheetMetaData;
 	//
 	//
 	int fileRowNum = 0;
@@ -71,9 +73,10 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 	 * 
 	 */
 	public EodNamesDirExchangesTxt(ACommDb acomm, DataTrackAccess _dataTrackAccess) {
-		//                 subject, topic, item, description
+
 		super(acomm, _dataTrackAccess);
 		//
+		appADatabaseAccess = new ADatabaseAccess(acomm, _dataTrackAccess.dbPropertyFileFullName, "ref_exchange", true);
 		//set file attributes
 		setDataTrackFileFieldDelimChar(acomm.getFileTextDelimTab());
 		//
@@ -115,19 +118,29 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 		//
 		aFileExcelPOI = new AFileExcelPOI(acomm, outExcelFileName);
 		//
-		aSheetDetail=aFileExcelPOI.doCreateNewSheet(thisClassName, 2
+		aSheetRequest=aFileExcelPOI.doCreateNewSheet(thisClassName, 2
 				    , Arrays.asList(".",".", acomm.getCurrTimestampAny(),thisDataTrackAccess.getTrackFileNameFull() )
 				  , Arrays.asList(fExchCd.getColumnName()
 				  	        , fExchangeNme.getColumnName()
-				  	        , fMsg.getColumnName()
 				            )
              );   		
+		//
+		aSheetResult=aFileExcelPOI.doCreateNewSheet("Results", 2
+			    , Arrays.asList(appADatabaseAccess.getThisTableName(),appADatabaseAccess.getThisAcomm().getDbUrlDbAndSchemaName())
+			  , Arrays.asList(fExchCd.getColumnName()
+			  	        , fExchangeNme.getColumnName()
+			  	        , fModUserid.getColumnName()
+			  	        , fModTs.getColumnName()
+			  	        , fMsg.getColumnName()			  	        
+			            )
+         );   		
+		
 		//
 	   acomm.addPageMsgsLineOut(thisClassName
              +" |extractFileName=" + extractFileName			    
 		     +"______________________"
 			 );
-		
+	   
 	   
 		return retb;
 	}
@@ -135,6 +148,8 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 	@Override
 	public boolean doSourceEnded(ACommDb acomm) {
 		super.doSourceEnded(acomm);
+		
+		
 		
 		outFile.closeFile();
 		
@@ -151,12 +166,15 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 		  //if no sql statement on report, comment out next line 
 		  
 		  //-------------check that file data header is correct for expected values
+		 //Columns are being added to map to hold DB columns 
+		 /*
 		  if (!compareFileDataStoreDataHead(acomm, 2)) {
 				throw new AException(acomm, thisClassName 
 						+ "=>File Data Head Fields do NOT Match Mapped Fields." 
 	               		+ " |File Data Head{" + getSourceDataHeadList().toString()					
 						);
 		  }
+		*/
 		//
 	    return true;
 	    //		return false to end processing    
@@ -185,11 +203,18 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 		//
 		++fileRowNum;
 		//
-		
+		aFileExcelPOI.doOutputRowNext(acomm, aSheetRequest
+		         , Arrays.asList(fExchCd.getColumnValue()
+			  	        , fExchangeNme.getColumnValue()
+		  	        
+		            )
+			   );	 		   
 		
 		getDataColResultListAsString();
 		
 		acomm.addPageMsgsLineOut(thisClassName+"=>Mapped Cols=>" + getDataColResultListAsString());
+
+		
 		
 		try {
 			   this.doDSRFieldsValidate(acomm);
@@ -205,19 +230,23 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
                //set db cols from mapped fields
 	 		   //doDSRFieldsToTableREF_EXCHANGE(acomm);	 		   
 	 		   //insert
+	 		   fMsg.setColumnValue("INSERT NOT implimented");
 	    	   //qREF_EXCHANGE.doProcessInsertRow(acomm);
 	    	   //
 	    	   //setRowsInsertedOkCtr(getRowsInsertedOkCtr() + 1);
 	 		   
-	 		    thisDataTrackStoreAccess.doProcessInsertRowForColsNotDefaulted();
-	 		    thisDataTrackStoreAccess.connectionCommit();
-	 		    
-				aFileExcelPOI.doOutputRowNext(acomm, aSheetDetail
-	    			         , Arrays.asList(fExchCd.getColumnValue()
-	  				  	        , fExchangeNme.getColumnValue()
-					  	        , fMsg.getColumnValue()
-					            )
-	    				   );	 		   
+	     		//aFileExcelPOI.doOutputRowNextBreak(acomm
+	 		     aFileExcelPOI.doOutputRowNext(acomm
+	 			         , aSheetResult
+	 				     , Arrays.asList(fExchCd.getColumnValue()
+	 				  	        , fExchangeNme.getColumnValue()
+	 				  	        , fModUserid.getColumnValue()
+	 				  	        , fModTs.getColumnValue()
+	 				  	        , fMsg.getColumnValue()
+	 				            )
+				     );  
+	 		   
+	 		   
 	    	   //
 	       } catch (AExceptionSql e1) {
 			  if (e1.isExceptionSqlRowDuplicate(acomm)) { //
@@ -240,6 +269,8 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 				   throw e1;
 			   }
            }
+	   
+	   
 		   /*
 		   if (qREF_EXCHANGE.getPsNumRowsInserted() > 0) {
 			   
@@ -350,6 +381,19 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
          }
 		//
 		thisDataTrackAccess.doQueryRsExcel(aFileExcelPOI
+                , "doQueryRsExcel "+appADatabaseAccess.getThisTableName()+" "
+                , "Select *" 
+                  +" from "+appADatabaseAccess.getThisTableName()+" " 
+                 //+ " Where field_nme  = '" + ufieldname +"'" 
+                  //+ " order by tab_name"
+                 //+ " order by subject, topic, item"
+                 );
+		//
+		appADatabaseAccess.doDbMetadataExcelSheet(aFileExcelPOI,appADatabaseAccess.getThisTableName()+" MetaData");
+        //
+		
+		//
+		thisDataTrackAccess.doQueryRsExcel(aFileExcelPOI
                 , "doQueryRsExcel data_track"
                 , "Select *"
                   +" from data_track " 
@@ -358,7 +402,7 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
                  + " order by subject, topic, item"
                  );
         //
-		thisDataTrackAccess.doDbMetadataExcelSheet(aFileExcelPOI,"DataTrack MetaData");
+		//thisDataTrackAccess.doDbMetadataExcelSheet(aFileExcelPOI,"DataTrack MetaData");
 		//
 		thisDataTrackAccess.childDataTrackStoreAccess.doQueryRsExcel(aFileExcelPOI
                 , "doQueryRsExcel data_track_store"
@@ -366,10 +410,10 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
                   +" from data_track_store " 
                  //+ " Where field_nme  = '" + ufieldname +"'" 
                  //+ " order by tab_name"
-                 + " order by data_track_id, source_nme, source_create_ts"
+                 + " order by data_track_id, source_nme, source_mod_ts, run_start_ts desc"
                  );
         //
-		thisDataTrackAccess.childDataTrackStoreAccess.doDbMetadataExcelSheet(aFileExcelPOI,"DataTrackStore MetaData");
+		//thisDataTrackAccess.childDataTrackStoreAccess.doDbMetadataExcelSheet(aFileExcelPOI,"DataTrackStore MetaData");
     	//
    		try {
 			aFileExcelPOI.doOutputEnd(acomm);
@@ -378,6 +422,8 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 		}
    		//
   		//
+		appADatabaseAccess.connectionCommit();
+		appADatabaseAccess.connectionEnd();
    		thisDataTrackAccess.connectionCommit();
    		thisDataTrackAccess.connectionEnd();
 	    //	   		        
