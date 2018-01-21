@@ -35,19 +35,19 @@ import net.amaware.serv.SourceProperty;
  * 
  */
 
-public class EodNamesDirExchangesTxt extends DataTrackStore {
+public class EodDirectoryNamesExchanges extends DataTrackStore {
 /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	final String thisClassName = this.getClass().getSimpleName();	
 	//
-	//*SqlApp AutoGen @2016-04-20 21:46:04.0
+	//*mapDataCol fields are used for database calls if the literal col name matches the table
     protected ADataColResult fExchCd = mapDataCol("exch_cd");
     protected ADataColResult fExchangeNme = mapDataCol("exchange_nme");
     //
-    protected ADataColResult fModTs = new  ADataColResult("mod_ts");
-    protected ADataColResult fModUserid = new  ADataColResult("mod_userid");
+    protected ADataColResult fModTs = mapDataCol("mod_ts");
+    protected ADataColResult fModUserid = mapDataCol("mod_userid");
     //add col for msg
     protected ADataColResult fMsg = new  ADataColResult("Message");
 	//
@@ -72,7 +72,7 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 	/**
 	 * 
 	 */
-	public EodNamesDirExchangesTxt(ACommDb acomm, DataTrackAccess _dataTrackAccess) {
+	public EodDirectoryNamesExchanges(ACommDb acomm, DataTrackAccess _dataTrackAccess) {
 
 		super(acomm, _dataTrackAccess);
 		//
@@ -216,39 +216,24 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 
 		
 		
-		try {
-			   this.doDSRFieldsValidate(acomm);
-		   } catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		   }
+		
+		//this.doDSRFieldsValidate(acomm);
 		
 	   try { 
-	 		   //setup defaults
-	 		   fModTs.setColumnValue(getTransTS());
-	 		   fModUserid.setColumnValue(acomm.getDbUserID());
-               //set db cols from mapped fields
-	 		   //doDSRFieldsToTableREF_EXCHANGE(acomm);	 		   
-	 		   //insert
-	 		   fMsg.setColumnValue("INSERT NOT implimented");
-	    	   //qREF_EXCHANGE.doProcessInsertRow(acomm);
-	    	   //
-	    	   //setRowsInsertedOkCtr(getRowsInsertedOkCtr() + 1);
-	 		   
-	     		//aFileExcelPOI.doOutputRowNextBreak(acomm
-	 		     aFileExcelPOI.doOutputRowNext(acomm
-	 			         , aSheetResult
-	 				     , Arrays.asList(fExchCd.getColumnValue()
-	 				  	        , fExchangeNme.getColumnValue()
-	 				  	        , fModUserid.getColumnValue()
-	 				  	        , fModTs.getColumnValue()
-	 				  	        , fMsg.getColumnValue()
-	 				            )
-				     );  
-	 		   
-	 		   
-	    	   //
-	       } catch (AExceptionSql e1) {
+ 		   //setup defaults
+ 		   fModTs.setColumnValue(getTransTS());
+ 		   fModUserid.setColumnValue(acomm.getDbUserID());
+           //set db cols from mapped fields
+ 		   //doDSRFieldsToTableREF_EXCHANGE(acomm);	 		   
+ 		   //insert
+ 		   
+ 		   acomm.addPageMsgsLineOut(thisClassName+"=>DataColResultList{"+getDataColResultListAsString()+"}");
+ 		   
+ 		   appADatabaseAccess.doProcessInsertRow(getDataColResultList());
+ 		   
+ 		   fMsg.setColumnValue("INSERTED");
+	    	 //
+       } catch (AExceptionSql e1) {
 			  if (e1.isExceptionSqlRowDuplicate(acomm)) { //
 				  // this.dataRowAppendLine("Not Inserted for ID{"+fExchCd.getColumnValue()+"}"
 				  
@@ -261,25 +246,26 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 				  
 				  setRowsInsertedDupsCtr(getRowsInsertedDupsCtr() + 1);
 				  
-				  fMsg.setColumnValue("Not Inserted for ID{"+fExchCd.getColumnValue()+"}"
+				  fMsg.setColumnValue("Duplicate Not Inserted for ID{"+fExchCd.getColumnValue()+"}"
 						            + "...msg{"+e1.getExceptionMsg()+"}"
 						             //, this.htmlLineErrorStyle);
 				                     , this.htmlColErrorStyle);
 			   } else {
 				   throw e1;
 			   }
-           }
+       }
+	   aFileExcelPOI.doOutputRowNext(acomm
+			         , aSheetResult
+				     , Arrays.asList(fExchCd.getColumnValue()
+				  	        , fExchangeNme.getColumnValue()
+				  	        , fModUserid.getColumnValue()
+				  	        , fModTs.getColumnValue()
+				  	        , fMsg.getColumnValue()
+				            )
+	     );  
+
 	   
-	   
-		   /*
-		   if (qREF_EXCHANGE.getPsNumRowsInserted() > 0) {
-			   
-			   //this.dataRowAppendLine("...Row Inserted for {"+qREF_EXCHANGE.getInsertStatement(acomm)+"}"
-			   fMsg.setColumnValue("...Row Inserted for {"+qREF_EXCHANGE.getInsertStatement(acomm)+"}"					   
-			            , this.htmlColOkStyle);
-			   
-		   }
-          */
+
 		   
 		//int _currRowNum = getSourceRowNum();
 		if (fileRowNum > getSourceDataRowEndNum()) {
@@ -293,49 +279,12 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 			
 		}
 		//
-		switch (fileRowNum) {
-		case 1:
-			//getThisHtmlServ().outPageLine(acomm, fRowNum.getColumnValue(),"color:black;background-color:white;");
-			break;
-		case 2:			
-			
-			break;
-
-		default:
-			//dataRowThis(acomm, _exceptionSql, _isRowBreak);
-		}
-		/*
-		acomm.addPageMsgsLineOut("=>" + thisClassName
-						+ "=>fField1{" + fFieldOne.getColumnValue() + "}"
-						+ " |fField2{" + fFieldTwo.getColumnValue()  + "}"
-						+ " |fField3{" + fFieldThree.getColumnValue()  + "}"
-						+ " |fField4{" + fFieldFour.getColumnValue()  + "}"
-						);
-		*/		
-				
 		if (!isDataRowOut()) {
 			   super.doDataRow(acomm, _exceptionSql, _isRowBreak);
 		}
-
-		//getThisHtmlServ().outPageLine(acomm, fCobolPrefix.getColumnValue(),"color:black;background-color:white;");
-		//getThisHtmlServ().outPageLine(acomm, getDataRowColsToString(),"color:black;background-color:white;");
-		/**/
-		//acomm.addPageMsgsLineOut("=>" + thisClassName
-		/*
-		getThisHtmlServ().outPageLine(acomm, 
-				  "fField1{" + fFieldOne.getColumnValue() + "}"
-				+ " |fField2{" + fFieldTwo.getColumnValue()  + "}"
-				+ " |fField3{" + fFieldThree.getColumnValue()  + "}"
-				+ " |fField4{" + fFieldFour.getColumnValue()  + "}"
-				,"color:black;background-color:linen;padding:.1em;"
-				);
-        */				
-		/**/
-		
-		
-		
+        //		
 		return true; // or false to stop processing of file
-
+        //
 	}
 	
 	
@@ -379,7 +328,11 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
     				+" |#MaxRows=" + getSourceDataRowEndNum()
  	    					);
          }
-		//
+        //
+		//commit before doing final reports
+		appADatabaseAccess.connectionCommit();
+   		thisDataTrackAccess.connectionCommit();
+        //
 		thisDataTrackAccess.doQueryRsExcel(aFileExcelPOI
                 , "doQueryRsExcel "+appADatabaseAccess.getThisTableName()+" "
                 , "Select *" 
@@ -421,36 +374,13 @@ public class EodNamesDirExchangesTxt extends DataTrackStore {
 			throw new AException(acomm, e, " Close of outFileExcel");
 		}
    		//
-  		//
-		appADatabaseAccess.connectionCommit();
 		appADatabaseAccess.connectionEnd();
-   		thisDataTrackAccess.connectionCommit();
    		thisDataTrackAccess.connectionEnd();
-	    //	   		        
-
-        
+   		//
 		//return super.doDataRowsEnded(acomm);
         return true;
 		
 	}
-	
-	/*
-	 * 
-	 */
-
-	//
-	//*SqlApp AutoGen @2016-04-20 21:46:04.0
-	 public void doDSRFieldsValidate(ACommDb acomm) throws Exception {
-	    fExchCd.setColumnValue(doFieldValidateString(acomm, fExchCd.getColumnValue()));
-	    fExchangeNme.setColumnValue(doFieldValidateString(acomm, fExchangeNme.getColumnValue()));
-	    //fModTs.setColumnValue(doFieldValidateString(acomm, fModTs.getColumnValue()));
-	   //fModUserid.setColumnValue(doFieldValidateString(acomm, fModUserid.getColumnValue()));
-	//
-	 } //End doDSRFieldsValidate
-	//
-	//* SqlApp DataStoreReport SET Table columns from DSR
-	 //
-	
 	
 	//
 	// END
