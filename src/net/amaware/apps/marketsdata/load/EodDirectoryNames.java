@@ -70,21 +70,8 @@ public class EodDirectoryNames extends DataTrackAccess  {
 		
 	    try {		
 	    	switch (filenamename.toLowerCase()) {
-	          case "amex.txt": 
-				   acomm.addPageMsgsLineOut(thisClassName+"Processing for{"+filenamename+"}");
-	        	   doFileTracking(acomm, _fileFullName
-      				     , "eodfeed", "ref", "exchanges-symbols", "Symbols for each Exhanges Codes"
-      				     );        	   
-      	   
-	        	   EodDirectoryNamesExchangesSymbols aEodDirectoryNamesExchangesSymbols = new EodDirectoryNamesExchangesSymbols(acomm, this);
-      	   
-      	           //aEodNamesDirExchangeTxt.doProcess(acomm, thisClassName);
-      	   
-      	           doFileProcessed(acomm,_fileFullName);
-	   	       
-	               break;
 
-	          case "exchanges.txt": 
+             case "exchanges.txt": 
 	        	   acomm.addPageMsgsLineOut(thisClassName+" Processing for{"+filenamename+"}");
 	        	   doFileTracking(acomm, _fileFullName
 	        				     , "eodfeed", "ref", "exchanges", "Markets Exchange Codes"
@@ -98,6 +85,25 @@ public class EodDirectoryNames extends DataTrackAccess  {
 	        	  
 	   	           //
 	               break;
+	    	
+	    	case "amex.txt":
+	    	case "forex.txt":
+	    	case "nasdaq.txt":
+	    	case "nyse.txt":
+	    	case "usmf.txt":
+				   acomm.addPageMsgsLineOut(thisClassName+"Processing for{"+filenamename+"}");
+	        	   doFileTracking(acomm, _fileFullName
+      				     , "eodfeed", "ref", "exchanges-symbols", "Symbols for each Exhanges Codes"
+      				     );        	   
+      	   
+	        	   EodDirectoryNamesExchangesSymbols aEodDirectoryNamesExchangesSymbols = new EodDirectoryNamesExchangesSymbols(acomm, this);
+      	   
+      	           //aEodNamesDirExchangeTxt.doProcess(acomm, thisClassName);
+      	   
+      	           doFileProcessed(acomm,_fileFullName);
+	   	       
+	               break;
+
 	           
 	        default: 
 		    	  //processFile(acomm, inFile);

@@ -231,7 +231,7 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
 		
 	   try { 
  		   //setup defaults
-		   fExchCd.setColumnValue(thisDataTrackAccess.getTrackFileName());
+		   fExchCd.setColumnValue(thisDataTrackAccess.getTrackFileName().toUpperCase().replace(".TXT", ""));
            //
  		   fModTs.setColumnValue(getTransTS());
  		   fModUserid.setColumnValue(acomm.getDbUserID());

@@ -361,7 +361,7 @@ public class EodDirectoryNamesExchanges extends DataTrackStore {
                 , "doQueryRsExcel data_track_store"
                 , "Select *"
                   +" from data_track_store " 
-                 //+ " Where field_nme  = '" + ufieldname +"'" 
+                  + " Where source_nme  = '" + thisDataTrackAccess.getTrackFileName() +"'"
                  //+ " order by tab_name"
                  + " order by data_track_id, source_nme, source_mod_ts, run_start_ts desc"
                  );
