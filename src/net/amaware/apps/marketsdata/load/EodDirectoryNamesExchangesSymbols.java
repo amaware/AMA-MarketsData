@@ -3,21 +3,14 @@
  */
 package net.amaware.apps.marketsdata.load;
 
-import java.io.File;
 import java.io.IOException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
 import org.apache.poi.ss.usermodel.Sheet;
 
 import net.amaware.appsbase.datatrack.DataTrackAccess;
 import net.amaware.appsbase.datatrack.DataTrackStore;
+import net.amaware.appsbase.datatrack.DataTrackStoreAccess.enumPROCESSED_STATE_ENUM;
 import net.amaware.autil.AComm;
 import net.amaware.autil.ACommDb;
 import net.amaware.autil.ADataColResult;
@@ -26,8 +19,6 @@ import net.amaware.autil.AException;
 import net.amaware.autil.AExceptionSql;
 import net.amaware.autil.AFileExcelPOI;
 import net.amaware.autil.AFileO;
-import net.amaware.serv.HtmlTargetServ;
-import net.amaware.serv.SourceProperty;
 
 
 /**
@@ -57,6 +48,7 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
 	Sheet aSheetRequest;	 
 	Sheet aSheetResult;
 	//
+	String thisExchCdValue="";
     //
 	AFileO outFile = new AFileO();
 	//
@@ -66,7 +58,7 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
 	//
 	int fileRowNum = 0;
 	int fileRowDisplayNum = 0;
-	int fileRowDisplayIncrNum = 100;
+	int fileRowDisplayIncrNum = 1000;
 	
 	int dataRowNum = 0;
 	//
@@ -80,7 +72,7 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
 
 		super(acomm, _dataTrackAccess);
 		//
-		appADatabaseAccess = new ADatabaseAccess(acomm, _dataTrackAccess.dbPropertyFileFullName, "ref_exch_symb", true);
+		appADatabaseAccess = new ADatabaseAccess(acomm, _dataTrackAccess.dbPropertyFileFullName, "ref_exch_symb", true, 1000);
 		//set file attributes
 		setDataTrackFileFieldDelimChar(acomm.getFileTextDelimTab());
 		//
@@ -100,6 +92,8 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
 		boolean retb = super.doSourceStarted(acomm);
 		if (!retb) { return retb; };
 		
+		thisExchCdValue=thisDataTrackAccess.getTrackFileName().toUpperCase().replace(".TXT", "");
+		
 		acomm.addPageMsgsLineOut(" ");
 		
 		try {
@@ -116,7 +110,8 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
 			throw new AException(acomm, e1, "extractFile Open=>");
 		}
 		
-	    String outExcelFileName=AComm.getOutFileDirectory()+AComm.getFileDirSeperator()+thisClassName+".report.xls";
+	    String outExcelFileName=AComm.getOutFileDirectory()+AComm.getFileDirSeperator()+thisClassName+AComm.getAppClassFileSep()
+	                            +AComm.getArgFileName()+".report.xls";
 	    
 	    acomm.addPageMsgsLineOut(thisClassName+ "=>Output Excel File Name{" +outExcelFileName +"}");
 		//
@@ -210,11 +205,15 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
 		++fileRowDisplayNum;
 		//
 		if (fileRowNum == 1 || fileRowDisplayNum > fileRowDisplayIncrNum) {
-			acomm.addPageMsgsLineOut(thisClassName+"=>InRec#"+fileRowNum+"=>Mapped Cols=>" + getDataColResultListAsString());
+			acomm.addPageMsgsLineOut("@ "+acomm.getCurrTimestampNew()+thisClassName+"=>InRec#"+fileRowNum+"=>Mapped Cols=>" + getDataColResultListAsString());
 			fileRowDisplayNum=1;
 		}
-			
-
+	/*		
+		if (fileRowNum > 3050) {
+			acomm.addPageMsgsLineOut(thisClassName+"=>InRec#"+fileRowNum+"=>END requested");
+			return false;
+		}
+	*/	
 		//
 		aFileExcelPOI.doOutputRowNext(acomm, aSheetRequest
 		         , Arrays.asList(fSymbCd.getColumnValue()
@@ -231,7 +230,7 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
 		
 	   try { 
  		   //setup defaults
-		   fExchCd.setColumnValue(thisDataTrackAccess.getTrackFileName().toUpperCase().replace(".TXT", ""));
+		   fExchCd.setColumnValue(thisExchCdValue);
            //
  		   fModTs.setColumnValue(getTransTS());
  		   fModUserid.setColumnValue(acomm.getDbUserID());
@@ -242,6 +241,8 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
  		   //acomm.addPageMsgsLineOut(thisClassName+"=>DataColResultList{"+getDataColResultListAsString()+"}");
  		   
  		   appADatabaseAccess.doProcessInsertRow(getDataColResultList());
+ 		   
+ 		   doAppCommitControl(acomm);
  		   
  		   fMsg.setColumnValue("INSERTED");
 	    	 //
@@ -342,14 +343,15 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
          }
         //
 		//commit before doing final reports
-		appADatabaseAccess.connectionCommit();
-   		thisDataTrackAccess.connectionCommit();
+		//appADatabaseAccess.connectionCommit();
+   		//thisDataTrackAccess.connectionCommit();
         //
-		thisDataTrackAccess.doQueryRsExcel(aFileExcelPOI
+   		//thisDataTrackAccess = new ADatabaseAccess(acomm, thisDataTrackAccess.dbPropertyFileFullName, "ref_exch_symb", true);
+   		appADatabaseAccess.doQueryRsExcel(aFileExcelPOI
                 , "doQueryRsExcel "+appADatabaseAccess.getThisTableName()+" "
                 , "Select *" 
                   +" from "+appADatabaseAccess.getThisTableName()+" " 
-                 //+ " Where field_nme  = '" + ufieldname +"'" 
+                 + " Where exch_cd  = '" + thisExchCdValue +"'" 
                   //+ " order by tab_name"
                  + " order by exch_cd, symb_cd"
                  );
@@ -358,7 +360,7 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
         //
 		
 		//
-		thisDataTrackAccess.doQueryRsExcel(aFileExcelPOI
+		appADatabaseAccess.doQueryRsExcel(aFileExcelPOI
                 , "doQueryRsExcel data_track"
                 , "Select *"
                   +" from data_track " 
