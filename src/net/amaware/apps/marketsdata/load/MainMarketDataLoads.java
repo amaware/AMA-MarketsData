@@ -84,6 +84,13 @@ public class MainMarketDataLoads {
               case "fundamentals": 
 				   acomm.addPageMsgsLineOut("Processing for{"+ACommDbFile.getArgFilePathDirName()+"}");
          	       directoryName = DirectoryName.FUNDAMENTALS;
+         	       
+         	       EodDirectoryFundamentals aEodDirectoryFundamentals = new EodDirectoryFundamentals(acomm, marketsPropFileName);
+         	       aEodDirectoryFundamentals.doProcess(acomm);
+         	       //
+         	       aEodDirectoryFundamentals.connectionEnd();
+         	       //
+         	       
                    break;
 
               case "names": 

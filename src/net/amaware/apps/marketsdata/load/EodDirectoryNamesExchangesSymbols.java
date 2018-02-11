@@ -72,7 +72,8 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
 
 		super(acomm, _dataTrackAccess);
 		//
-		appADatabaseAccess = new ADatabaseAccess(acomm, _dataTrackAccess.dbPropertyFileFullName, "ref_exch_symb", true, 1000);
+		appADatabaseAccess = new ADatabaseAccess(acomm, _dataTrackAccess.dbPropertyFileFullName
+				, "ref_exch_symb", true, 1000);
 		//set file attributes
 		setDataTrackFileFieldDelimChar(acomm.getFileTextDelimTab());
 		//
@@ -221,8 +222,6 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
 		  	        
 		            )
 			   );	 		   
-		
-		getDataColResultListAsString();
 		
 		//acomm.addPageMsgsLineOut(thisClassName+"=>Mapped Cols=>" + getDataColResultListAsString());
 		
@@ -388,7 +387,10 @@ public class EodDirectoryNamesExchangesSymbols extends DataTrackStore {
 			throw new AException(acomm, e, " Close of outFileExcel");
 		}
    		//
+   		appADatabaseAccess.connectionCommit();
 		appADatabaseAccess.connectionEnd();
+		//
+		thisDataTrackAccess.connectionCommit();
    		thisDataTrackAccess.connectionEnd();
    		//
 		//return super.doDataRowsEnded(acomm);

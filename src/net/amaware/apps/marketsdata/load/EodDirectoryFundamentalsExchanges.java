@@ -3,19 +3,19 @@
  */
 package net.amaware.apps.marketsdata.load;
 
-import java.io.File;
+import java.awt.List;
 import java.io.IOException;
-
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.Vector;
 
 import org.apache.poi.ss.usermodel.Sheet;
 
+import net.amaware.app.DataStoreReport;
 import net.amaware.appsbase.datatrack.DataTrackAccess;
 import net.amaware.appsbase.datatrack.DataTrackStore;
 import net.amaware.autil.AComm;
@@ -35,47 +35,77 @@ import net.amaware.serv.SourceProperty;
  * 
  */
 
-public class EodDirectoryNamesExchanges extends DataTrackStore {
+public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 /**
-	 * 
-	 */
+ * 
+ */
 	private static final long serialVersionUID = 1L;
-	final String thisClassName = this.getClass().getSimpleName();	
+	final String thisClassName = this.getClass().getName();	
 	//
-	//*mapDataCol fields are used for database calls if the literal col name matches the table
-    protected ADataColResult fExchCd = mapDataCol("exch_cd");
-    protected ADataColResult fExchangeNme = mapDataCol("exchange_nme");
+	//ref_exch_symb--------------------------
+    protected ADataColResult fSymbCd = mapDataCol("symb_cd");
+    protected ADataColResult fSymbNme = mapDataCol("symb_nme");
+    //ref_sector-----------------------------
+    protected ADataColResult fSectorNme = mapDataCol("sector_nme");
+    protected ADataColResult fIndustryNme = mapDataCol("industry_nme");
+    //?--------------------------
+    protected ADataColResult fPriceEarn = mapDataCol("PE");
+    protected ADataColResult fEarningsShare = mapDataCol("EPS");
+    protected ADataColResult fDivYield =  mapDataCol("DivYield");
+    protected ADataColResult fSharesOutAmt = mapDataCol("Shares");
+    protected ADataColResult fDivShare = mapDataCol("DPS");
+    protected ADataColResult fPriceEarnGrowth = mapDataCol("PEG");
+    protected ADataColResult fPriceSales = mapDataCol("PtS");
+    protected ADataColResult fPriceBookValue = mapDataCol("PtB");
     //
+    //common------------------------------------------------
     protected ADataColResult fModTs = mapDataCol("mod_ts");
     protected ADataColResult fModUserid = mapDataCol("mod_userid");
     //add col for msg
-    protected ADataColResult fMsg = new  ADataColResult("Message");
-	//
+    protected ADataColResult fMsg = mapDataCol("Message");
+    //
+    //Add fields not in input file
+    protected ADataColResult fSourceNme = mapDataCol("source_nme");    
+    protected ADataColResult fExchCd = mapDataCol("exch_cd");    
+    //
+	//-----------variables---------------- 
     //ADatabaseAccess thisADatabaseAccess; // in super
 	static AFileExcelPOI aFileExcelPOI = new AFileExcelPOI(); 
 	Sheet aSheetRequest;	 
-	Sheet aSheetResult;
+	Sheet aSheetResult;    
 	//
-    //
+	String thisExchCdValue="";
+	String thisSourceNmeValue="";
+	//
+	String inputFileName = "";
+	String outFileNamePrefix="";	
 	AFileO outFile = new AFileO();
 	//
 	String extractFileNameProperty = "extractNameFull";
 	String extractFileName    = "";
+	//	
 	//
-	//
+	String transTS="";
+	int numRowsInserted=0;
 	int fileRowNum = 0;
+	int fileRowNumDispCnt = 0;
+	int fileRowNumDispMaxCnt = 100;
 	int dataRowNum = 0;
 	//
+	//--------------Files-----------
 	//
+    //	
 	/**
 	 * 
 	 */
-	public EodDirectoryNamesExchanges(ACommDb acomm, DataTrackAccess _dataTrackAccess) {
+
+	public EodDirectoryFundamentalsExchanges(ACommDb acomm, DataTrackAccess _dataTrackAccess) {
 
 		super(acomm, _dataTrackAccess);
 		//
+		//build using Sector/Industry fields
 		appADatabaseAccess = new ADatabaseAccess(acomm, _dataTrackAccess.dbPropertyFileFullName
-				                                , "ref_exchange", true);
+				                                , "ref_sector", true);
 		//set file attributes
 		setDataTrackFileFieldDelimChar(acomm.getFileTextDelimTab());
 		//
@@ -88,12 +118,17 @@ public class EodDirectoryNamesExchanges extends DataTrackStore {
 	    //
 	    mainApp.doProcess(acomm, thisClassName);
 	    //
-	}
+	}	
+	
 
 	@Override
 	public boolean doSourceStarted(ACommDb acomm) {
 		boolean retb = super.doSourceStarted(acomm);
 		if (!retb) { return retb; };
+		
+		thisSourceNmeValue=thisDataTrackAccess.getTrackFileName();
+		
+		thisExchCdValue=thisDataTrackAccess.getTrackFileName().toUpperCase().replace(".TXT", "");
 		
 		acomm.addPageMsgsLineOut(" ");
 		
@@ -117,21 +152,20 @@ public class EodDirectoryNamesExchanges extends DataTrackStore {
 		//
 		aFileExcelPOI = new AFileExcelPOI(acomm, outExcelFileName);
 		//
+		this.getDataRowColsValueList();
+		//
 		aSheetRequest=aFileExcelPOI.doCreateNewSheet(thisClassName, 2
 				    , Arrays.asList(".",".", acomm.getCurrTimestampAny(),thisDataTrackAccess.getTrackFileNameFull() )
-				  , Arrays.asList(fExchCd.getColumnName()
-				  	        , fExchangeNme.getColumnName()
-				            )
+				    //, Arrays.asList(fExchCd.getColumnName()
+				  	 //       , fSymbCd.getColumnName()
+				      //      )
+				    ,  getDataRowColsNameList()        
+				    
              );   		
 		//
 		aSheetResult=aFileExcelPOI.doCreateNewSheet("Results", 2
 			    , Arrays.asList(appADatabaseAccess.getThisTableName(),appADatabaseAccess.getThisAcomm().getDbUrlDbAndSchemaName())
-			  , Arrays.asList(fExchCd.getColumnName()
-			  	        , fExchangeNme.getColumnName()
-			  	        , fModUserid.getColumnName()
-			  	        , fModTs.getColumnName()
-			  	        , fMsg.getColumnName()			  	        
-			            )
+			    , getDataRowColsNameList()
          );   		
 		
 		//
@@ -154,13 +188,13 @@ public class EodDirectoryNamesExchanges extends DataTrackStore {
 		
 		return true;
 	}
-	
+
+
 	@Override
 	public boolean doDataHead(ACommDb acomm, int _recNum
 			//, Vector dataFields
 			)
 			throws AException {
-
 		 super.doDataHead(acomm, _recNum);
 		  //if no sql statement on report, comment out next line 
 		  
@@ -178,11 +212,18 @@ public class EodDirectoryNamesExchanges extends DataTrackStore {
 	    return true;
 	    //		return false to end processing    
 
-	} 	
+	}
+	
 	@Override
 	public boolean doDataRowsNotFound(ACommDb acomm) throws AException {
+
+		 //if no sql statement on report for not found, comment out next line		
+		setUserTitle2(getThisHtmlServ().formatForSqlout(acomm, getThisStatement()));
 		super.doDataRowsNotFound(acomm);
+		
+		//throw new AException(acomm, "DataRowsNot Found");
 		return true;
+
 	}
 
 	/*
@@ -203,18 +244,19 @@ public class EodDirectoryNamesExchanges extends DataTrackStore {
 		++fileRowNum;
 		//
 		aFileExcelPOI.doOutputRowNext(acomm, aSheetRequest
-		         , Arrays.asList(fExchCd.getColumnValue()
-			  	        , fExchangeNme.getColumnValue()
-		  	        
-		            )
+		         , getDataRowColsValueList()
 			   );	 		   
 		
 		acomm.addPageMsgsLineOut(thisClassName+"=>Mapped Cols=>" + getDataColResultListAsString());
+		
 		
 		//this.doDSRFieldsValidate(acomm);
 		
 	   try { 
  		   //setup defaults
+		   fSourceNme.setColumnValue(thisSourceNmeValue);
+		   fExchCd.setColumnValue(thisExchCdValue);
+		   
  		   fModTs.setColumnValue(getTransTS());
  		   fModUserid.setColumnValue(acomm.getDbUserID());
  		   
@@ -229,7 +271,7 @@ public class EodDirectoryNamesExchanges extends DataTrackStore {
 				  
 				  setRowsInsertedDupsCtr(getRowsInsertedDupsCtr() + 1);
 				  
-				  fMsg.setColumnValue("Duplicate Not Inserted for ID{"+fExchCd.getColumnValue()+"}"
+				  fMsg.setColumnValue("Duplicate Not Inserted for ID{"+fSymbCd.getColumnValue()+"}"
 						            + "...msg{"+e1.getExceptionMsg()+"}"
 						             //, this.htmlLineErrorStyle);
 				                     , this.htmlColErrorStyle);
@@ -239,12 +281,7 @@ public class EodDirectoryNamesExchanges extends DataTrackStore {
        }
 	   aFileExcelPOI.doOutputRowNext(acomm
 			         , aSheetResult
-				     , Arrays.asList(fExchCd.getColumnValue()
-				  	        , fExchangeNme.getColumnValue()
-				  	        , fModUserid.getColumnValue()
-				  	        , fModTs.getColumnValue()
-				  	        , fMsg.getColumnValue()
-				            )
+			         , getDataRowColsValueList()
 	     );  
 
 	   
@@ -369,7 +406,13 @@ public class EodDirectoryNamesExchanges extends DataTrackStore {
 		
 	}
 	
+	/*
+	 * 
+	 */
+
+	//	
 	//
 	// END
 	//	
  }
+
