@@ -7,8 +7,10 @@ import java.awt.List;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
@@ -40,7 +42,7 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
  * 
  */
 	private static final long serialVersionUID = 1L;
-	final String thisClassName = this.getClass().getName();	
+	final String thisClassName = this.getClass().getSimpleName();	
 	//
 	//ref_exch_symb--------------------------
     protected ADataColResult fSymbCd = mapDataCol("symb_cd");
@@ -49,24 +51,25 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
     protected ADataColResult fSectorNme = mapDataCol("sector_nme");
     protected ADataColResult fIndustryNme = mapDataCol("industry_nme");
     //?--------------------------
-    protected ADataColResult fPriceEarn = mapDataCol("PE");
-    protected ADataColResult fEarningsShare = mapDataCol("EPS");
-    protected ADataColResult fDivYield =  mapDataCol("DivYield");
-    protected ADataColResult fSharesOutAmt = mapDataCol("Shares");
-    protected ADataColResult fDivShare = mapDataCol("DPS");
-    protected ADataColResult fPriceEarnGrowth = mapDataCol("PEG");
-    protected ADataColResult fPriceSales = mapDataCol("PtS");
-    protected ADataColResult fPriceBookValue = mapDataCol("PtB");
+    protected ADataColResult fPriceEarn = mapDataCol("price_earning");
+    protected ADataColResult fEarningsShare = mapDataCol("earnings_share");
+    protected ADataColResult fDivYield =  mapDataCol("div_yield");
+    protected ADataColResult fSharesOutAmt = mapDataCol("shares_out_amt");
+    protected ADataColResult fDivShare = mapDataCol("div_share");
+    protected ADataColResult fPriceEarnGrowth = mapDataCol("price_earn_growth");
+    protected ADataColResult fPriceSales = mapDataCol("price_sales");
+    protected ADataColResult fPriceBookValue = mapDataCol("price_book_value");
     //
     //common------------------------------------------------
     protected ADataColResult fModTs = mapDataCol("mod_ts");
     protected ADataColResult fModUserid = mapDataCol("mod_userid");
+    //Add fields not in input file
+    protected ADataColResult fEntryDate = mapDataCol("entry_date");
+    protected ADataColResult fSourceNme = mapDataCol("source_nme");    
+    protected ADataColResult fExchCd = mapDataCol("exch_cd");
     //add col for msg
     protected ADataColResult fMsg = mapDataCol("Message");
     //
-    //Add fields not in input file
-    protected ADataColResult fSourceNme = mapDataCol("source_nme");    
-    protected ADataColResult fExchCd = mapDataCol("exch_cd");    
     //
 	//-----------variables---------------- 
     //ADatabaseAccess thisADatabaseAccess; // in super
@@ -74,6 +77,7 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 	Sheet aSheetRequest;	 
 	Sheet aSheetResult;    
 	//
+	String thisEntryDate="";
 	String thisExchCdValue="";
 	String thisSourceNmeValue="";
 	//
@@ -94,17 +98,24 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 	//
 	//--------------Files-----------
 	//
+	ADatabaseAccess refSectorADatabaseAccess;	
     //	
 	/**
 	 * 
 	 */
 
 	public EodDirectoryFundamentalsExchanges(ACommDb acomm, DataTrackAccess _dataTrackAccess) {
-
+        //
 		super(acomm, _dataTrackAccess);
 		//
-		//build using Sector/Industry fields
+		Date date = new Date();
+		thisEntryDate= new SimpleDateFormat("yyyy-MM-dd").format(date);
+		//Main table for input file fields gets logged
 		appADatabaseAccess = new ADatabaseAccess(acomm, _dataTrackAccess.dbPropertyFileFullName
+                , "sym_fundamental", true);
+		
+		//build using Sector/Industry fields
+		refSectorADatabaseAccess = new ADatabaseAccess(acomm, _dataTrackAccess.dbPropertyFileFullName
 				                                , "ref_sector", true);
 		//set file attributes
 		setDataTrackFileFieldDelimChar(acomm.getFileTextDelimTab());
@@ -146,9 +157,10 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 			throw new AException(acomm, e1, "extractFile Open=>");
 		}
 		
-	    String outExcelFileName=AComm.getOutFileDirectory()+AComm.getFileDirSeperator()+thisClassName+".report.xls";
-	    
-	    acomm.addPageMsgsLineOut(thisClassName+ "=>Output Excel File Name{" +outExcelFileName +"}");
+	    String outExcelFileName=AComm.getOutFileDirectory()+AComm.getFileDirSeperator()+thisClassName+AComm.getAppClassFileSep()
+        +AComm.getArgFileName()+".report.xls";
+
+         acomm.addPageMsgsLineOut(thisClassName+ "=>Output Excel File Name{" +outExcelFileName +"}");
 		//
 		aFileExcelPOI = new AFileExcelPOI(acomm, outExcelFileName);
 		//
@@ -242,51 +254,71 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 		}
 		//
 		++fileRowNum;
+		if (fileRowNum > 1) {
+			//return false;
+		}
 		//
+		if (fSectorNme==null || fSectorNme.getColumnValue()==null || fSectorNme.getColumnValue().isEmpty()) {
+			fSectorNme.setColumnValue("");
+		}
+		if (fIndustryNme==null || fIndustryNme.getColumnValue()==null || fIndustryNme.getColumnValue().isEmpty()) {
+			fIndustryNme.setColumnValue("");
+		}
+
 		aFileExcelPOI.doOutputRowNext(acomm, aSheetRequest
 		         , getDataRowColsValueList()
 			   );	 		   
 		
-		acomm.addPageMsgsLineOut(thisClassName+"=>Mapped Cols=>" + getDataColResultListAsString());
+		if (fileRowNum == 1) {
+			acomm.addPageMsgsLineOut(thisClassName+"=>Mapped Cols=>" + getDataColResultListAsString());	
+		}
 		
-		
-		//this.doDSRFieldsValidate(acomm);
-		
-	   try { 
- 		   //setup defaults
-		   fSourceNme.setColumnValue(thisSourceNmeValue);
-		   fExchCd.setColumnValue(thisExchCdValue);
+	   //setup defaults
+	   fEntryDate.setColumnValue(thisEntryDate);
+	   fSourceNme.setColumnValue(thisSourceNmeValue);
+	   fExchCd.setColumnValue(thisExchCdValue);
 		   
- 		   fModTs.setColumnValue(getTransTS());
- 		   fModUserid.setColumnValue(acomm.getDbUserID());
- 		   
- 		   acomm.addPageMsgsLineOut(thisClassName+"=>DataColResultList{"+getDataColResultListAsString()+"}");
- 		   
+	   fModTs.setColumnValue(getTransTS());
+	   fModUserid.setColumnValue(acomm.getDbUserID());
+		   
+	   acomm.addPageMsgsLineOut("Row#{"+fileRowNum+"}"+"=>DataColResultList{"+getDataColResultListAsString()+"}");
+       //	
+	   StringBuffer sbmsg = new StringBuffer();
+	   //
+	   try { 
  		   appADatabaseAccess.doProcessInsertRow(getDataColResultList());
- 		   
- 		   fMsg.setColumnValue("INSERTED");
-	    	 //
+ 		   sbmsg.append(appADatabaseAccess.getThisTableName()+"{INSERTED] ");
        } catch (AExceptionSql e1) {
 			  if (e1.isExceptionSqlRowDuplicate(acomm)) { //
-				  
 				  setRowsInsertedDupsCtr(getRowsInsertedDupsCtr() + 1);
-				  
-				  fMsg.setColumnValue("Duplicate Not Inserted for ID{"+fSymbCd.getColumnValue()+"}"
-						            + "...msg{"+e1.getExceptionMsg()+"}"
-						             //, this.htmlLineErrorStyle);
-				                     , this.htmlColErrorStyle);
+				  sbmsg.append(appADatabaseAccess.getThisTableName()
+						      +"{Duplicate Not Inserted for ID{"+fSymbCd.getColumnValue()+"}"
+						      + "...msg{"+e1.getExceptionMsg()+"} ");				  
 			   } else {
 				   throw e1;
 			   }
        }
-	   aFileExcelPOI.doOutputRowNext(acomm
+	   //
+	   try { 
+		   refSectorADatabaseAccess.doProcessInsertRow(getDataColResultList());
+ 		   sbmsg.append(refSectorADatabaseAccess.getThisTableName()+"{INSERTED] ");
+       } catch (AExceptionSql e1) {
+			  if (e1.isExceptionSqlRowDuplicate(acomm)) { //
+				  setRowsInsertedDupsCtr(getRowsInsertedDupsCtr() + 1);
+				  sbmsg.append(refSectorADatabaseAccess.getThisTableName()
+						      +"{Duplicate Not Inserted for ID{"+fSymbCd.getColumnValue()+"}"
+						      + "...msg{"+e1.getExceptionMsg()+"} ");				  
+			   } else {
+				   throw e1;
+			   }
+       }
+	   //
+	   fMsg.setColumnValue(sbmsg.toString());
+	   //   
+  	   aFileExcelPOI.doOutputRowNext(acomm
 			         , aSheetResult
 			         , getDataRowColsValueList()
 	     );  
-
-	   
-
-		   
 		//int _currRowNum = getSourceRowNum();
 		if (fileRowNum > getSourceDataRowEndNum()) {
 			throw new AException(acomm, thisClassName 
@@ -382,7 +414,7 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
                   +" from data_track_store " 
                   + " Where source_nme  = '" + thisDataTrackAccess.getTrackFileName() +"'"
                  //+ " order by tab_name"
-                 + " order by data_track_id, source_nme, source_mod_ts, run_start_ts desc"
+                 + " order by  run_start_ts desc, source_nme, source_mod_ts, data_track_id"
                  );
         //
 		//thisDataTrackAccess.childDataTrackStoreAccess.doDbMetadataExcelSheet(aFileExcelPOI,"DataTrackStore MetaData");
@@ -395,6 +427,9 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
    		//
    		appADatabaseAccess.connectionCommit();
 		appADatabaseAccess.connectionEnd();
+		//
+		refSectorADatabaseAccess.connectionCommit();
+		refSectorADatabaseAccess.connectionEnd();
 		//
 		thisDataTrackAccess.connectionCommit();
    		thisDataTrackAccess.connectionEnd();
