@@ -81,6 +81,36 @@ public class MainMarketDataLoads {
 					                              );			
 			
 	    	switch (ACommDbFile.getArgFilePathDirName().toLowerCase()) {
+//                   
+//---------EodDirectoryNames--------------
+//EodDirectoryNamesExchanges                   
+//Exchanges.txt
+//-Code	Name
+//-AMEX	American Stock Exchange
+//=>ref_exchange (exch_cd;exchange_nme)	    	
+//                   
+//aEodDirectoryNamesExchangesSymbols
+//<exchange>.txt
+//Symbol	Name
+//AA.P	Alcoa Inc Pf 3.75
+//=>ref_exch_symb (exch_cd;symb_cd;symb_nme;sector_id)	    	
+              case "names": 
+            	   acomm.addPageMsgsLineOut("Processing for{"+ACommDbFile.getArgFilePathDirName()+"}");
+         	       directoryName = DirectoryName.NAMES;
+         	    
+         	       EodDirectoryNames aEodDirectoryNames = new EodDirectoryNames(acomm, marketsPropFileName);
+         	       aEodDirectoryNames.doProcess(acomm);
+         	       //
+         	       aEodDirectoryNames.connectionEnd();
+         	       //
+                   break;
+//                   
+//---------EodDirectoryFundamentals--------------
+//EodDirectoryFundamentalsExchanges                   
+//<exchange>.txt
+//Symbol	Name	Sector	Industry	PE	EPS	DivYield	Shares	DPS	PEG	PtS	PtB
+//AA.P	Alcoa Inc Pf 3.75	Capital Goods	Metal Fabrications	0	0	0	0	0	0	0	0
+///=>sym_fundamental.ref_exch_symb_id (ref_exch_symb_id;entry_date)	    	
               case "fundamentals": 
 				   acomm.addPageMsgsLineOut("Processing for{"+ACommDbFile.getArgFilePathDirName()+"}");
          	       directoryName = DirectoryName.FUNDAMENTALS;
@@ -91,17 +121,6 @@ public class MainMarketDataLoads {
          	       aEodDirectoryFundamentals.connectionEnd();
          	       //
          	       
-                   break;
-
-              case "names": 
-            	   acomm.addPageMsgsLineOut("Processing for{"+ACommDbFile.getArgFilePathDirName()+"}");
-         	       directoryName = DirectoryName.NAMES;
-         	    
-         	       EodDirectoryNames aEodDirectoryNames = new EodDirectoryNames(acomm, marketsPropFileName);
-         	       aEodDirectoryNames.doProcess(acomm);
-         	       //
-         	       aEodDirectoryNames.connectionEnd();
-         	       //
                    break;
                  
               default: 
