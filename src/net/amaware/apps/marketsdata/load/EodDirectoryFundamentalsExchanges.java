@@ -80,6 +80,7 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 	//
 	String thisEntryDate="";
 	String thisExchCdValue="";
+	String thisSymbCdValue="";
 	String thisSourceNmeValue="";
 	String thisRefExchSymbId="";
 	String thisRefSectorId="";
@@ -112,8 +113,6 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
         //
 		super(acomm, _dataTrackAccess);
 		//
-		Date date = new Date();
-		thisEntryDate= new SimpleDateFormat("yyyy-MM-dd").format(date);
 		//Main table for input file fields gets logged
 		appADatabaseAccess = new ADatabaseAccess(acomm, _dataTrackAccess.dbPropertyFileFullName
                 , "sym_fundamental", true, 250); //use this number to resolve timeout of update data_track
@@ -148,6 +147,10 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 		thisSourceNmeValue=thisDataTrackAccess.getTrackFileName();
 		
 		thisExchCdValue=thisDataTrackAccess.getTrackFileName().toUpperCase().replace(".TXT", "");
+
+		//Date date = new Date();
+		//thisEntryDate= new SimpleDateFormat("yyyy-MM-dd").format(date);
+		thisEntryDate= thisDataTrackAccess.getTrackFileLastModifiedDate();//.substring(0,10); //"yyyy-MM-dd HH:mm:ss"
 		
 		acomm.addPageMsgsLineOut(" ");
 		
@@ -262,8 +265,14 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 		}
 		//
 		++fileRowNum;
-		if (fileRowNum > 1) {
-			//return false;
+		
+		int fileRestartNum=0;
+		
+		fileRestartNum=27367;
+		if (fileRowNum < fileRestartNum) {
+			return true;
+		} else if (fileRowNum == fileRestartNum) {
+			doAppCommitControlRestart(acomm, fileRowNum);
 		}
 		//
 		if (fSectorNme==null || fSectorNme.getColumnValue()==null || fSectorNme.getColumnValue().isEmpty()) {
@@ -272,7 +281,8 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 		if (fIndustryNme==null || fIndustryNme.getColumnValue()==null || fIndustryNme.getColumnValue().isEmpty()) {
 			fIndustryNme.setColumnValue("");
 		}
-
+		thisSymbCdValue=fSymbCd.getColumnValue();
+		//
 		aFileExcelPOI.doOutputRowNext(acomm, aSheetRequest
 		         , getDataRowColsValueList()
 			   );	 		   
@@ -297,7 +307,7 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
     	   refExchSymbADatabaseAccess.doQuery("select id "
                    + " FROM ref_exch_symb "
                    + " WHERE exch_cd = " +"'"+ thisExchCdValue +"'"
-                   + "   AND symb_cd = " +"'"+ fSymbCd.getColumnValue() +"'"
+                   + "   AND symb_cd = " +"'"+ thisSymbCdValue +"'"
 	                     );            
     	   thisRefExchSymbId="";
     	   while (refExchSymbADatabaseAccess.doQueryRowNext()) { // puts all columns of row to aADataColResultList
@@ -333,7 +343,7 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 			  if (e1.isExceptionSqlRowDuplicate(acomm)) { //
 				  setRowsInsertedDupsCtr(getRowsInsertedDupsCtr() + 1);
 				  sbmsg.append(appADatabaseAccess.getThisTableName()
-						      +"{Duplicate Not Inserted for ID{"+fSymbCd.getColumnValue()+"}"
+						      +"{Duplicate Not Inserted for ID{"+thisSymbCdValue+"}"
 						      + "...msg{"+e1.getExceptionMsg()+"} ");				  
 			   } else {
 				   throw e1;
@@ -347,19 +357,20 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 			  if (e1.isExceptionSqlRowDuplicate(acomm)) { //
 				  setRowsInsertedDupsCtr(getRowsInsertedDupsCtr() + 1);
 				  sbmsg.append(refSectorADatabaseAccess.getThisTableName()
-						      +"{Duplicate Not Inserted for ID{"+fSymbCd.getColumnValue()+"}"
+						      +"{Duplicate Not Inserted for ID{"+thisSymbCdValue+"}"
 						      + "...msg{"+e1.getExceptionMsg()+"} ");				  
 			   } else {
 				   throw e1;
 			   }
        }
 	   //
-	   ADataColResult aRefExchSymbSectorId = new ADataColResult("", "");
+	   //ADataColResult aRefExchSymbSectorId = new ADataColResult("", "");
+	   
        try {    
     	   refSectorADatabaseAccess.doQuery("select id "
-                   + " FROM ref_exch_symb "
-                   + " WHERE exch_cd = " +"'"+ thisExchCdValue +"'"
-                   + "   AND symb_cd = " +"'"+ fSymbCd.getColumnValue() +"'"
+                   + " FROM ref_sector "
+                   + " WHERE sector_nme = " +"'"+ fSectorNme.getColumnValue() +"'"
+                   + "   AND industry_nme = " +"'"+ fIndustryNme.getColumnValue() +"'"
 	                     );            
     	   thisRefSectorId="";
     	   while (refSectorADatabaseAccess.doQueryRowNext()) { // puts all columns of row to aADataColResultList
@@ -380,12 +391,22 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
             
             //acomm.addPageMsgsLineOut(thisClassName+"=>Found=>"+refExchSymbADatabaseAccess.getThisTableName()+"=>"+sbmsg);        
             
-            refExchSymbADatabaseAccess.doProcessUpdateRow(Arrays.asList(new ADataColResult("id", thisRefSectorId))
+            int numupt = refExchSymbADatabaseAccess.doProcessUpdateRow(Arrays.asList(new ADataColResult("sector_id", thisRefSectorId))
             		                                   ,Arrays.asList(new ADataColResult("exch_cd", thisExchCdValue)
-            		                                		         ,new ADataColResult("symb_cd", fSymbCd.getColumnValue())
+            		                                		         ,new ADataColResult("symb_cd", thisSymbCdValue)
             		                                		         )
-            		                                   );
-            sbmsg.append(" |UPDATED "+refExchSymbADatabaseAccess.getThisTableName()+" ");
+            		);
+            if (numupt==0) {
+            	throw new AException(acomm, thisClassName+"=>Row NOT UPDATED{"
+                                    +refExchSymbADatabaseAccess.getThisTableName()+"}"
+                                    + " for " +" ExchCd{"+thisExchCdValue+"}"+" symb_cd{"+thisSymbCdValue+"}" + " update col sectorId{"+thisRefSectorId+"}"
+                                    );
+            }
+            		
+            sbmsg.append(" |UPDATED{"+refExchSymbADatabaseAccess.getThisTableName()+"}"
+            		    +" #updt{"+numupt+"}" 
+            		    +" sectorId{"+thisRefSectorId+"} for " +" ExchCd{"+thisExchCdValue+"}"+" symb_cd{"+thisSymbCdValue+"}"
+                        );
             
        } catch (AExceptionSql e1) {
        	       throw  e1;
@@ -393,14 +414,17 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 	   //
        fSymFundamentalId.setColumnValue(thisRefSectorId);	   
 	   //
-	   acomm.addPageMsgsLineOut("Row#{"+fileRowNum+"} exchCd{"+thisExchCdValue+"}"+" symbCd{"+fSymbCd.getColumnValue()+"}"+" ["+sbmsg.toString()+"]");
+	   acomm.addPageMsgsLineOut("Row#{"+fileRowNum+"} exchCd{"+thisExchCdValue+"}"+" symbCd{"+thisSymbCdValue+"}"+" ["+sbmsg.toString()+"]");
 	   //
 	   fMsg.setColumnValue(sbmsg.toString());
 	   //
+	   //______________________________________________________________________________
 	   //in case noting has been inserted/updated due to dups
 		if (fileRowNum > appADatabaseAccess.commitAtNum) {
 			doAppCommitControl(acomm, fileRowNum);
 		}
+	   //______________________________________________________________________________
+		
 	   //
   	   aFileExcelPOI.doOutputRowNext(acomm
 			         , aSheetResult

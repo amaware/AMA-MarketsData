@@ -72,7 +72,7 @@ public class EodDirectoryFundamentals extends DataTrackAccess {
 	    	case "usmf.txt":
 				   acomm.addPageMsgsLineOut(thisClassName+"Processing for{"+filenamename+"}");
 	        	   doFileTracking(acomm, _fileFullName
-     				     , "eodfeed", "ref", "fundamentals", "Fundamental data for each Exhange Symbols"
+     				     , "eodfeed", "sym", "fundamentals", "Fundamental data for each Exhange Symbols"
      				     );        	   
      	   
 	        	   //EodDirectoryFundamentalsExchanges aEodDirectoryFundamentalsExchanges = new EodDirectoryFundamentalsExchanges(acomm, this);
