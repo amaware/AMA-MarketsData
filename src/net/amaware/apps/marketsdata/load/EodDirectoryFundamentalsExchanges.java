@@ -264,12 +264,15 @@ public class EodDirectoryFundamentalsExchanges extends DataTrackStore {
 			throw _exceptionSql;
 		}
 		//
+		//if (true) {	return false;	}
+		//
 		++fileRowNum;
-		
+        //
+        //		
 		int fileRestartNum=0;
-		
-		fileRestartNum=27367;
-		if (fileRowNum < fileRestartNum) {
+		//fileRestartNum=27367;
+		if (fileRestartNum==0) {
+		} else if (fileRowNum < fileRestartNum) {
 			return true;
 		} else if (fileRowNum == fileRestartNum) {
 			doAppCommitControlRestart(acomm, fileRowNum);
