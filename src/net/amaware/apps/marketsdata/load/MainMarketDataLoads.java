@@ -61,7 +61,7 @@ public class MainMarketDataLoads {
 	//
 	//static EodFundamentalsDirFile eodFundamentalsDirFile = new EodFundamentalsDirFile();
     //
-	public enum DirectoryName {  FUNDAMENTALS, NAMES, NONE; };
+	public enum DirectoryName {  TECHNICAL, FUNDAMENTALS, NAMES, NONE; };
 	static DirectoryName directoryName;
     //
 	static String fileNameToProcess="";
@@ -122,7 +122,19 @@ public class MainMarketDataLoads {
          	       //
          	       
                    break;
-                 
+                   
+              case "technical": 
+				   acomm.addPageMsgsLineOut("Processing for{"+ACommDbFile.getArgFilePathDirName()+"}");
+         	       directoryName = DirectoryName.TECHNICAL;
+         	       
+         	       EodDirectoryTechnical aEodDirectoryTechical = new EodDirectoryTechnical(acomm, marketsPropFileName);
+         	      aEodDirectoryTechical.doProcess(acomm);
+         	       //
+         	     aEodDirectoryTechical.connectionEnd();
+         	       //
+         	       
+                   break;
+                                  
               default: 
 		    	  //processFile(acomm, inFile);
 		    	   String outmsg="===UNKNOWN Directory Name===>"+ACommDbFile.getArgFilePathDirName();
