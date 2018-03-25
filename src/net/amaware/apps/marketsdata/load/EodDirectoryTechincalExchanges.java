@@ -51,7 +51,7 @@ public class EodDirectoryTechincalExchanges extends DataTrackStore {
     //protected ADataColResult fRefExchSymbId = mapDataCol("ref_exch_symb_id");
     //protected ADataColResult fId = mapDataCol("id");
     protected ADataColResult fPrevious = mapDataCol("previous");
-    protected ADataColResult fChange = mapDataCol("change");
+    protected ADataColResult fChange = mapDataCol("changed");
     protected ADataColResult fVolumeChange = mapDataCol("volume_change");
     protected ADataColResult fWeekHigh = mapDataCol("week_high");
     protected ADataColResult fWeekLow = mapDataCol("week_low");
